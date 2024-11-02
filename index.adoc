@@ -6,7 +6,7 @@ Digital de Imagens.
 
 == Primeira Unidade
 
-* Cap 2 - Manipulando pixels numa imagem
+* Cap 2 - Manipulando pixels numa imagem link:cap2.adoc[Cap 2 - Manipulando pixels numa imagem]
 * Cap 5 - Serialização do ponto flutuante via FileStorage
 * Cap 10 - Decomposição de imagens em plano de bits
 * Cap 11 - Preenchendo regiões

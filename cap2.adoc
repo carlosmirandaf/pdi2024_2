@@ -29,7 +29,7 @@ e faço a subtração com o trecho correspondente ao que os laços percorre por 
 A consequência é o trecho da imagem sendo mostrada com as cores invertidas gerado por cada
 valor dessa operação. Abaixo encontra-se o resultado da imagem:
 
-image::negativo_screenshot_03.10.2024.png[]
+image::pdi2024_2/negativo_screenshot_03.10.2024.png[]
 
 O código completo encontra-se adiante:
 
