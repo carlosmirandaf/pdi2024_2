@@ -1,0 +1,13 @@
+= Processamento Digital de Imagens (2024.2)
+Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
+
+Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
+Digital de Imagens.
+
+== Primeira Unidade
+
+* Cap 2 - Manipulando pixels numa imagem
+* Cap 5 - Serialização do ponto flutuante via FileStorage
+* Cap 10 - Decomposição de imagens em plano de bits
+* Cap 11 - Preenchendo regiões
+* Cap 12 - Manipulação de histograma
