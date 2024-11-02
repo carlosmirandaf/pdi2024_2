@@ -1,0 +1,59 @@
+= Processamento Digital de Imagens (2024.2)
+Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
+
+== Cap 2 - Manipulando pixels numa imagem
+
+=== Exercícios 2.1
+
+O exercício trata de pegar uma imagem, escolher um determinado trecho da sua região
+e com ele fazer uma manipulação para inverter as cores deste trecho. Através da biblioteca OpenCV,
+faz-se primeiro o teste para verificar se a imagem será executada, de forma que será utilizado
+um comando que forçará a imagem a ser lida e mostrada em tons de cinza (cv::IMREAD_GRAYSCALE).
+
+Adiante, dois laços for são adicionados no código para percorrer os pixels da imagem. Dentro
+do for, o espaço delimitado para a região negativa vai dos pontos (150, 210) até (100, 200),
+considerando que o tamanho da imagem seja 256x256. O trecho com os laços for encontra-se abaixo:
+
+//trecho para os laços for do código
+----
+    for(int i=150; i<210; i++) {    //originalmente a imagem tem tamanho 256x256
+        for (int j= 100; j<200; j++) {
+            image.at<uchar>(i,j) = 255 - image.at<uchar>(i,j);  //assim posso obter o negativo 
+                                                                //pelo trecho da imagem
+        }
+    }
+----
+
+O efeito negativo ocorre ao pegar o valor máximo do pixel (em um intervalo que vai de 0 a 255)
+e faço a subtração com o trecho correspondente ao que os laços percorre por largura e altura.
+A consequência é o trecho da imagem sendo mostrada com as cores invertidas gerado por cada
+valor dessa operação. Abaixo encontra-se o resultado da imagem:
+
+image::negativo_screenshot_03.10.2024.png
+
+O código completo encontra-se adiante:
+
+----
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+int main(int, char**) {
+    cv::Mat image;
+
+    image = cv::imread("biel.png", cv::IMREAD_GRAYSCALE);
+    if(!image.data) std::cout << "Não abriu a imagem" << std::endl;
+
+    cv::namedWindow("negativo", cv::WINDOW_AUTOSIZE);
+
+    for(int i=150; i<210; i++) {    //originalmente a imagem tem tamanho 256x256
+        for (int j= 100; j<200; j++) {
+            image.at<uchar>(i,j) = 255 - image.at<uchar>(i,j);  //assim posso obter o negativo pelo trecho da imagem
+        }
+    }
+    //peguei os valores de i e j de forma que subtrai-os pelo valor 255, 
+    //cada valor gerado resulta no negativo do trecho
+    cv::imshow("negativo", image);
+    cv::waitKey();
+
+}
+----
