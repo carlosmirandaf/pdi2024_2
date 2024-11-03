@@ -118,7 +118,7 @@ fs << "mat" << image;
 ---- 
 
 enquanto que a linha seguinte
- ---- 
+---- 
  fs.release();
- ---- 
- fecha o fluxo de arquivo para a saída.
+---- 
+fecha o fluxo de arquivo para a saída.
