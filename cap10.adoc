@@ -1,0 +1,87 @@
+= Processamento Digital de Imagens (2024.2)
+Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
+
+== Cap 10 - Decomposição de imagens em planos de bits
+
+O capítulo originalmente trata da técnica de esconder uma imagem dentro de outra chamada <b>esteganografia</b>. Este funcionamento se dá de forma que se extrai 1 pixel da figura com 3 bytes associadas ela e para cada byte, pega-se os bits mais significativos da imagem para colocar nos bits menos significativos da outra e salvo-a em um determinado formato de imagem, que neste caso foi .png.
+
+=== Exercícios 10.3
+
+Enquanto no caso inicial uma imagem foi ocultada em outra, neste exercício foi feito o processo inverso. Uma imagem está oculta dentro de outra e o objetivo aqui é extrair informações dela e "descobri-la". Em outras palavras, vamos extrair essa imagem.
+
+A figura objeto de estudo encontra-se abaixo:
+
+image::desafio-esteganografia.png[]
+
+Para o código, recorrendo ao OpenCV, primeiramente foram criadas variáveis para a imagem acima (a esteganografada) e outra para aquela que será extraída. Em virtude de ambas serem coloridas, foi utilizado um vetor para que guardasse as cores RGB chamada _Vec3b_, nele teremos os valores para os dois casos:
+
+----
+  cv::Mat imagemEsteganografada, imagemExtraida;
+  cv::Vec3b valEsteganografada, valExtraida;
+  int nbits = 3;
+----
+
+O valor do núemro de bits igual a 3 representa os bits menos significativos usados para a gravura original. Após este passo, foi feita a leitura e uma cópia dela, seguido assim dos laços for que irão percorrer a sua largura e a altura.
+
+----
+  //Para fazer a extração, vou percorrer a imagem pixel por pixel
+  for (int i=0; i<imagemEsteganografada.rows; i++) {
+    for (int j=0; j<imagemEsteganografada.cols; j++) {
+        valEsteganografada = imagemEsteganografada.at<cv::Vec3b>(i,j);
+
+        //Vou pegar os nbits e subtrair por 1 para extrair os bits menos significativos
+        valExtraida[0] = (valEsteganografada[0] & ((1 << nbits)-1)) << (8 - nbits);
+        valExtraida[1] = (valEsteganografada[1] & ((1 << nbits)-1)) << (8 - nbits);
+        valExtraida[2] = (valEsteganografada[2] & ((1 << nbits)-1)) << (8 - nbits);
+        imagemExtraida.at<cv::Vec3b>(i, j) = valExtraida;
+    }
+  }
+----
+
+Cada um dos valores extraídos dos bits vai resultar do caminho percorrido para cada pixel e extrair os bits da imagem escondida (representada por _valEsteganografada_ e os seus 3 bits menos significativos selecionados). O resultado desta extração encontra-se adiante:
+
+image::imagem_decodificada.png[]
+
+O código completo abaixo:
+
+----
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+int main(int argc, char**argv) {
+  cv::Mat imagemEsteganografada, imagemExtraida;
+  cv::Vec3b valEsteganografada, valExtraida;
+  int nbits = 3;
+
+  if (argc < 2) {
+        std::cout << "Uso: " << argv[0] << " <imagem_esteganografada>" << std::endl;
+        return -1;
+    }
+
+  imagemEsteganografada = cv::imread(argv[1], cv::IMREAD_COLOR);
+  if (imagemEsteganografada.empty()) {
+    std::cout << "Imagem não pode ser carregada" << std::endl;
+    return (-1);
+  }
+
+  //Fazendo cópia da imagem que será objeto de decodificação do código
+  imagemExtraida = imagemEsteganografada.clone();
+
+  //Para fazer a extração, vou percorrer a imagem pixel por pixel
+  for (int i=0; i<imagemEsteganografada.rows; i++) {
+    for (int j=0; j<imagemEsteganografada.cols; j++) {
+        valEsteganografada = imagemEsteganografada.at<cv::Vec3b>(i,j);
+
+        //Vou pegar os nbits e subtrair por 1 para extrair os bits menos significativos
+        valExtraida[0] = (valEsteganografada[0] & ((1 << nbits)-1)) << (8 - nbits);
+        valExtraida[1] = (valEsteganografada[1] & ((1 << nbits)-1)) << (8 - nbits);
+        valExtraida[2] = (valEsteganografada[2] & ((1 << nbits)-1)) << (8 - nbits);
+        imagemExtraida.at<cv::Vec3b>(i, j) = valExtraida;
+    }
+  }
+
+  imwrite("imagem_decodificada.png", imagemExtraida);
+
+  return 0;
+}
+----

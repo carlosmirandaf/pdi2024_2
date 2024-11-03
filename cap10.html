@@ -443,148 +443,106 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_cap_5_serialização_de_dados_em_ponto_flutuante_via_filestorage">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</h2>
+<h2 id="_cap_10_decomposição_de_imagens_em_planos_de_bits">Cap 10 - Decomposição de imagens em planos de bits</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>O armazenamento de dados em forma de ponto flutuante é usado em casos para se obter imagens de alta dinâmica, imagens de profundidade ou máscaras usadas em filtros digitais, só para citar alguns exemplos. As imagens aqui estão armazenadas em um tipo <em>float</em> ou <em>double</em> e a biblioteca do OpenCV usa um comando chamado &lt;b&gt;FileStorage&lt;/b&gt; para armazenar seus valores em diferentes tipos de arquivos. Para o exercício deste capítulo, o formato escolhido foi <em>yaml</em>.</p>
+<p>O capítulo originalmente trata da técnica de esconder uma imagem dentro de outra chamada &lt;b&gt;esteganografia&lt;/b&gt;. Este funcionamento se dá de forma que se extrai 1 pixel da figura com 3 bytes associadas ela e para cada byte, pega-se os bits mais significativos da imagem para colocar nos bits menos significativos da outra e salvo-a em um determinado formato de imagem, que neste caso foi .png.</p>
 </div>
 <div class="sect2">
-<h3 id="_exercícios_5_2">Exercícios 5.2</h3>
+<h3 id="_exercícios_10_3">Exercícios 10.3</h3>
 <div class="paragraph">
-<p>Para este exercício, as dimensões da imagens são do tipo 256x256 pixels que contém uma senóide de 4 períodos e amplitude igual a 127 desenhada na horizontal. Inicialmente foi feito os comandos para o nome do arquivo, o formato e o tipo de dado para o código (que neste caso será de 32 bits), o trecho inicial encontra-se abaixo:</p>
+<p>Enquanto no caso inicial uma imagem foi ocultada em outra, neste exercício foi feito o processo inverso. Uma imagem está oculta dentro de outra e o objetivo aqui é extrair informações dela e "descobri-la". Em outras palavras, vamos extrair essa imagem.</p>
+</div>
+<div class="paragraph">
+<p>A figura objeto de estudo encontra-se abaixo:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="desafio-esteganografia.png" alt="desafio esteganografia">
+</div>
+</div>
+<div class="paragraph">
+<p>Para o código, recorrendo ao OpenCV, primeiramente foram criadas variáveis para a imagem acima (a esteganografada) e outra para aquela que será extraída. Em virtude de ambas serem coloridas, foi utilizado um vetor para que guardasse as cores RGB chamada <em>Vec3b</em>, nele teremos os valores para os dois casos:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>  std::stringstream ss_img, ss_yml; //cria uma string com o nome do arquivo na saída
-  cv::Mat image;
-
-  ss_yml &lt;&lt; "senoide-" &lt;&lt; SIDE &lt;&lt; ".yml"; //SIDE é a constante e yml é o formato que terá o arquivo
-  image = cv::Mat::zeros(SIDE, SIDE, CV_32FC1); //vai representar um dado em 32 bits em ponto flutuante
-                                                //em um só canal
-
-  cv::FileStorage fs(ss_yml.str(), cv::FileStorage::WRITE);</pre>
+<pre>  cv::Mat imagemEsteganografada, imagemExtraida;
+  cv::Vec3b valEsteganografada, valExtraida;
+  int nbits = 3;</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Para o &lt;b&gt;FileStorage&lt;/b&gt;, seu primeiro parâmetro é o arquivo de saída, seu segundo parâmetro é o modo de abertura do arquivo. Neste caso,  o modo de abertura é cv::FileStorage::WRITE, o que indica que o arquivo será aberto para escrita, permitindo a gravação da imagem gerada em ponto flutuante.</p>
-</div>
-<div class="paragraph">
-<p>Dando continuidade ao código, o laço for vai percorrer todos os elementos da matriz image, como o tamanho é do tipo 256x256, ambas percorrerão o mesmo valor SIDE e cada elemento percorrido terá um valor atribuído ao brilho por conta da amplitude da senóide naquele ponto. O trecho encontra-se abaixo:</p>
+<p>O valor do núemro de bits igual a 3 representa os bits menos significativos usados para a gravura original. Após este passo, foi feita a leitura e uma cópia dela, seguido assim dos laços for que irão percorrer a sua largura e a altura.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>    for (int i = 0; i &lt; SIDE; i++) {
-        for (int j = 0; j &lt; SIDE; j++) {
-            image.at&lt;float&gt;(i, j) = 127 * sin(2 * M_PI * PERIODOS * j / SIDE) + 128;
+<pre>  //Para fazer a extração, vou percorrer a imagem pixel por pixel
+  for (int i=0; i&lt;imagemEsteganografada.rows; i++) {
+    for (int j=0; j&lt;imagemEsteganografada.cols; j++) {
+        valEsteganografada = imagemEsteganografada.at&lt;cv::Vec3b&gt;(i,j);
+
+        //Vou pegar os nbits e subtrair por 1 para extrair os bits menos significativos
+        valExtraida[0] = (valEsteganografada[0] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        valExtraida[1] = (valEsteganografada[1] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        valExtraida[2] = (valEsteganografada[2] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        imagemExtraida.at&lt;cv::Vec3b&gt;(i, j) = valExtraida;
     }
   }</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Graças ao tamanho, os valores da senóide deverão ficar entre o intervalo 0 e 255. Para que isso seja possível, o valor 127 é multiplicado pelo trecho da senóide e somado com 128 em seguida. O resultado encontra-se a seguir:</p>
+<p>Cada um dos valores extraídos dos bits vai resultar do caminho percorrido para cada pixel e extrair os bits da imagem escondida (representada por <em>valEsteganografada</em> e os seus 3 bits menos significativos selecionados). O resultado desta extração encontra-se adiante:</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="exercicio5_senoide.png" alt="exercicio5 senoide">
+<img src="imagem_decodificada.png" alt="imagem decodificada">
 </div>
 </div>
 <div class="paragraph">
-<p>O desenho mostrado acima mostra um padrão ondulado que seria correspondente ao desenho de uma onda senoidal. As regiões mais escuras correspondem aos pontos de mínimo da senóide e as regiões mais claras correspondem aos pontos de máximo da senóide.</p>
-</div>
-<div class="paragraph">
-<p>Um trecho do arquivo <em>yml</em> mostra os valores computados pelo código:</p>
+<p>O código completo abaixo:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>%YAML:1.0
-mat: !!opencv-matrix
-   rows: 256
-   cols: 256
-   dt: f
-   data: [ 128., 1.40448181e+02, 1.52776474e+02, 1.64866150e+02,
-       1.76600800e+02, 1.87867386e+02, 1.98557419e+02, 2.08567947e+02,
-       2.17802567e+02, 2.26172333e+02, 2.33596634e+02, 2.40003998e+02,
-       2.45332703e+02, 2.49531418e+02, 2.52559738e+02, 2.54388458e+02,
-       255., 2.54388458e+02, 2.52559738e+02, 2.49531418e+02,
-       2.45332703e+02, 2.40003998e+02, 2.33596634e+02, 2.26172333e+02,
-       2.17802567e+02, 2.08567947e+02, 1.98557419e+02, 1.87867386e+02,
-       1.76600800e+02, 1.64866150e+02, 1.52776474e+02, 1.40448181e+02,</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Ao diminuir os períodos, o observado foi que a região clara aparecem em menores
-quantidades, porém elas são mais longas em comparação com a imagem do exemplo. Da mesma
-forma se observa para as regiões mais escuras. Caso o número de períodos de senóide fosse aumentado para 8, o resultado em forma de imagem seria:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="exercicio5_senoide_periodo8.png" alt="exercicio5 senoide periodo8">
-</div>
-</div>
-<div class="paragraph">
-<p>Voltando para o caso do número de períodos igual a 4, o código completo encontra-se abaixo:</p>
-</div>
-<div class="listingblock cpp">
-<div class="content">
 <pre>#include &lt;iostream&gt;
 #include &lt;opencv2/opencv.hpp&gt;
-#include &lt;sstream&gt;
-#include &lt;string&gt;
 
-int SIDE = 256;
-int PERIODOS = 4;
+int main(int argc, char**argv) {
+  cv::Mat imagemEsteganografada, imagemExtraida;
+  cv::Vec3b valEsteganografada, valExtraida;
+  int nbits = 3;
 
-int main (int argc, char** argv) {
-    std::stringstream ss_img, ss_yml;
-    cv::Mat image;
+  if (argc &lt; 2) {
+        std::cout &lt;&lt; "Uso: " &lt;&lt; argv[0] &lt;&lt; " &lt;imagem_esteganografada&gt;" &lt;&lt; std::endl;
+        return -1;
+    }
 
-    ss_yml &lt;&lt; "senoide- " &lt;&lt; SIDE &lt;&lt; ".yml";    //SIDE é a constante e yml é o formato que terá o arquivo
-    image = cv::Mat::zeros(SIDE, SIDE, CV_32FC1); //vai representar um dado em 32 bits em ponto flutuante
-                                                //em um só canal
+  imagemEsteganografada = cv::imread(argv[1], cv::IMREAD_COLOR);
+  if (imagemEsteganografada.empty()) {
+    std::cout &lt;&lt; "Imagem não pode ser carregada" &lt;&lt; std::endl;
+    return (-1);
+  }
 
-    cv::FileStorage fs(ss_yml.str(), cv::FileStorage::WRITE);
+  //Fazendo cópia da imagem que será objeto de decodificação do código
+  imagemExtraida = imagemEsteganografada.clone();
 
-    for (int i = 0; i &lt; SIDE; i++) {
-        for (int j = 0; j &lt; SIDE; j++) {
-            image.at&lt;float&gt;(i, j) = 127 * sin(2 * M_PI * PERIODOS * j / SIDE) + 128;
+  //Para fazer a extração, vou percorrer a imagem pixel por pixel
+  for (int i=0; i&lt;imagemEsteganografada.rows; i++) {
+    for (int j=0; j&lt;imagemEsteganografada.cols; j++) {
+        valEsteganografada = imagemEsteganografada.at&lt;cv::Vec3b&gt;(i,j);
+
+        //Vou pegar os nbits e subtrair por 1 para extrair os bits menos significativos
+        valExtraida[0] = (valEsteganografada[0] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        valExtraida[1] = (valEsteganografada[1] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        valExtraida[2] = (valEsteganografada[2] &amp; ((1 &lt;&lt; nbits)-1)) &lt;&lt; (8 - nbits);
+        imagemExtraida.at&lt;cv::Vec3b&gt;(i, j) = valExtraida;
     }
   }
 
-  fs &lt;&lt; "mat" &lt;&lt; image;
-  fs.release();
-
-  cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
-  image.convertTo(image, CV_8U);
-  ss_img &lt;&lt; "senoide-" &lt;&lt; SIDE &lt;&lt; ".png";
-  cv::imwrite(ss_img.str(), image);
-
-  fs.open(ss_yml.str(), cv::FileStorage::READ);
-  fs["mat"] &gt;&gt; image;
-
-  cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
-  image.convertTo(image, CV_8U);
-
-  cv::imshow("image", image);
-  cv::waitKey();
+  imwrite("imagem_decodificada.png", imagemExtraida);
 
   return 0;
 }</pre>
 </div>
-</div>
-<div class="paragraph">
-<p>A serialização dos resultados é obtida através do trecho:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>fs &lt;&lt; "mat" &lt;&lt; image;</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>enquanto que a linha seguinte
- ----
- fs.release();
- ----
- fecha o fluxo de arquivo para a saída.</p>
 </div>
 </div>
 </div>
@@ -592,7 +550,7 @@ int main (int argc, char** argv) {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-03 16:04:23 -0300
+Last updated 2024-11-03 16:32:17 -0300
 </div>
 </div>
 </body>

@@ -40,9 +40,8 @@ O desenho mostrado acima mostra um padrão ondulado que seria correspondente ao 
 
 Um trecho do arquivo _yml_ mostra os valores computados pelo código:
 
----
+----
 %YAML:1.0
----
 mat: !!opencv-matrix
    rows: 256
    cols: 256
@@ -55,7 +54,7 @@ mat: !!opencv-matrix
        2.45332703e+02, 2.40003998e+02, 2.33596634e+02, 2.26172333e+02,
        2.17802567e+02, 2.08567947e+02, 1.98557419e+02, 1.87867386e+02,
        1.76600800e+02, 1.64866150e+02, 1.52776474e+02, 1.40448181e+02,
----
+----
 
 Ao diminuir os períodos, o observado foi que a região clara aparecem em menores
 quantidades, porém elas são mais longas em comparação com a imagem do exemplo. Da mesma
