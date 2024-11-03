@@ -25,7 +25,7 @@ image::negativo_screenshot_03.10.2024.png[]
 
 O código completo encontra-se adiante:
 
-[regions.cpp, C++]
+[regions.cpp, cpp]
 ----
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -85,7 +85,7 @@ image::troca_screenshot_03.10.2024.png[]
 
 O código completo encontra-se abaixo:
 
-[trocaregioes.cpp, C++]
+[trocaregioes.cpp, cpp]
 ----
 #include <iostream>
 #include <opencv2/opencv.hpp>
