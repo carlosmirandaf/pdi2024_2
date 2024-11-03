@@ -3,7 +3,7 @@ Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
 
 == Cap 5 - Serialização de dados em ponto flutuante via FileStorage
 
-O armazenamento de dados em forma de ponto flutuante é usado em casos para se obter imagens de alta dinâmica, imagens de profundidade ou máscaras usadas em filtros digitais, só para citar alguns exemplos. As imagens aqui estão armazenadas em um tipo _float_ ou _double_ e a biblioteca do OpenCV usa um comando chamado <b>FileStorage</b> para armazenar seus valores em diferentes tipos de arquivos. Para o exercício deste capítulo, o formato escolhido foi _yaml_.
+O armazenamento de dados em forma de ponto flutuante é usado em casos para se obter imagens de alta dinâmica, imagens de profundidade ou máscaras usadas em filtros digitais, só para citar alguns exemplos. As imagens aqui estão armazenadas em um tipo _float_ ou _double_ e a biblioteca do OpenCV usa um comando chamado *FileStorage* para armazenar seus valores em diferentes tipos de arquivos. Para o exercício deste capítulo, o formato escolhido foi _yaml_.
 
 === Exercícios 5.2
 
@@ -20,7 +20,7 @@ Para este exercício, as dimensões da imagens são do tipo 256x256 pixels que c
   cv::FileStorage fs(ss_yml.str(), cv::FileStorage::WRITE);
 ----
 
-Para o <b>FileStorage</b>, seu primeiro parâmetro é o arquivo de saída, seu segundo parâmetro é o modo de abertura do arquivo. Neste caso,  o modo de abertura é cv::FileStorage::WRITE, o que indica que o arquivo será aberto para escrita, permitindo a gravação da imagem gerada em ponto flutuante.
+Para o *FileStorage*, seu primeiro parâmetro é o arquivo de saída, seu segundo parâmetro é o modo de abertura do arquivo. Neste caso,  o modo de abertura é cv::FileStorage::WRITE, o que indica que o arquivo será aberto para escrita, permitindo a gravação da imagem gerada em ponto flutuante.
 
 Dando continuidade ao código, o laço for vai percorrer todos os elementos da matriz image, como o tamanho é do tipo 256x256, ambas percorrerão o mesmo valor SIDE e cada elemento percorrido terá um valor atribuído ao brilho por conta da amplitude da senóide naquele ponto. O trecho encontra-se abaixo:
 

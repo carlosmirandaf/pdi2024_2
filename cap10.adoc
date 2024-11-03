@@ -3,7 +3,7 @@ Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
 
 == Cap 10 - Decomposição de imagens em planos de bits
 
-O capítulo originalmente trata da técnica de esconder uma imagem dentro de outra chamada <b>esteganografia</b>. Este funcionamento se dá de forma que se extrai 1 pixel da figura com 3 bytes associadas ela e para cada byte, pega-se os bits mais significativos da imagem para colocar nos bits menos significativos da outra e salvo-a em um determinado formato de imagem, que neste caso foi .png.
+O capítulo originalmente trata da técnica de esconder uma imagem dentro de outra chamada *esteganografia*. Este funcionamento se dá de forma que se extrai 1 pixel da figura com 3 bytes associadas ela e para cada byte, pega-se os bits mais significativos da imagem para colocar nos bits menos significativos da outra e salvo-a em um determinado formato de imagem, que neste caso foi .png.
 
 === Exercícios 10.3
 

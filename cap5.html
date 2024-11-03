@@ -446,7 +446,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_cap_5_serialização_de_dados_em_ponto_flutuante_via_filestorage">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>O armazenamento de dados em forma de ponto flutuante é usado em casos para se obter imagens de alta dinâmica, imagens de profundidade ou máscaras usadas em filtros digitais, só para citar alguns exemplos. As imagens aqui estão armazenadas em um tipo <em>float</em> ou <em>double</em> e a biblioteca do OpenCV usa um comando chamado &lt;b&gt;FileStorage&lt;/b&gt; para armazenar seus valores em diferentes tipos de arquivos. Para o exercício deste capítulo, o formato escolhido foi <em>yaml</em>.</p>
+<p>O armazenamento de dados em forma de ponto flutuante é usado em casos para se obter imagens de alta dinâmica, imagens de profundidade ou máscaras usadas em filtros digitais, só para citar alguns exemplos. As imagens aqui estão armazenadas em um tipo <em>float</em> ou <em>double</em> e a biblioteca do OpenCV usa um comando chamado <strong>FileStorage</strong> para armazenar seus valores em diferentes tipos de arquivos. Para o exercício deste capítulo, o formato escolhido foi <em>yaml</em>.</p>
 </div>
 <div class="sect2">
 <h3 id="_exercícios_5_2">Exercícios 5.2</h3>
@@ -466,7 +466,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="paragraph">
-<p>Para o &lt;b&gt;FileStorage&lt;/b&gt;, seu primeiro parâmetro é o arquivo de saída, seu segundo parâmetro é o modo de abertura do arquivo. Neste caso,  o modo de abertura é cv::FileStorage::WRITE, o que indica que o arquivo será aberto para escrita, permitindo a gravação da imagem gerada em ponto flutuante.</p>
+<p>Para o <strong>FileStorage</strong>, seu primeiro parâmetro é o arquivo de saída, seu segundo parâmetro é o modo de abertura do arquivo. Neste caso,  o modo de abertura é cv::FileStorage::WRITE, o que indica que o arquivo será aberto para escrita, permitindo a gravação da imagem gerada em ponto flutuante.</p>
 </div>
 <div class="paragraph">
 <p>Dando continuidade ao código, o laço for vai percorrer todos os elementos da matriz image, como o tamanho é do tipo 256x256, ambas percorrerão o mesmo valor SIDE e cada elemento percorrido terá um valor atribuído ao brilho por conta da amplitude da senóide naquele ponto. O trecho encontra-se abaixo:</p>
@@ -580,11 +580,15 @@ int main (int argc, char** argv) {
 </div>
 </div>
 <div class="paragraph">
-<p>enquanto que a linha seguinte
- ----
- fs.release();
- ----
- fecha o fluxo de arquivo para a saída.</p>
+<p>enquanto que a linha seguinte</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre> fs.release();</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>fecha o fluxo de arquivo para a saída.</p>
 </div>
 </div>
 </div>
@@ -592,7 +596,7 @@ int main (int argc, char** argv) {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-03 16:04:23 -0300
+Last updated 2024-11-03 16:45:54 -0300
 </div>
 </div>
 </body>
