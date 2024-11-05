@@ -9,5 +9,5 @@ Digital de Imagens.
 * link:cap2.html[Cap 2 - Manipulando pixels numa imagem]
 * link:cap5.html[Cap 5 - Serialização de dados em ponto flutuante via FileStorage]
 * link:cap10.html[Cap 10 - Decomposição de imagens em plano de bits]
-* Cap 11 - Preenchendo regiões
+* link:cap11.html[Cap 11 - Preenchendo regiões]
 * Cap 12 - Manipulação de histograma
