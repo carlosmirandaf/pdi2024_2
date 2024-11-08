@@ -1,0 +1,384 @@
+= Processamento Digital de Imagens (2024.2)
+Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
+
+== Cap 14 - Filtragem no domínio espacial 1 - Convolução
+
+Uma das formas mais utilizadas para correção de tons de cinza de uma imagem é a equalização, que por sua vez usa o histograma para fazer o espalhamento desses tons nela. No entanto, ela é uma forma sujeita a problemas de falso contorno, que é considerado indesejado na obtenção de um resultado satisfatório. Para evitar este tipo de defeito, recorre-se a técnicas de filtragem para obter a captura de uma imagem para evitá-la junto com outros elementos indesejados, como ruídos.
+
+Enquanto a equalização, mostrada no capítulo 12, lida com apenas 1 pixel, a técnica mostrada aqui, chamada *convolução*, utiliza-se dos seus vizinhos para filtrar uma imagem ou vídeo. Para isso, ela precisa de uma quantidade A e uma quantidade B, agrega-se a ambas através de um sinal e combinando-as no domínio do tempo, considerando que elas sejam sinais. Em forma de equação:
+
+[latex]
+----
+f(x) * g(x) = \int_{-\infty}^{+\infty} f(\alpha) \cdot g(x - \alpha) \, d\alpha
+----
+
+No caso de uma imagem, a convolução é trabalhada no espaço. Portanto uma convolução digital trabalha com o *processo de filtragem linear com máscara*. Com as máscaras, pode-se projetar diferentes efeitos, muitos deles voltados para o borramento ou aguçamento, se uma imagem original possui muitas descontinuidades, o aguçamento aumenta. Dentre os filtros usados para efeito de borramento, encontram-se os filtros *média* e *gaussiana*. Efeitos voltados para aguçamento são o *laplaciano* e o *Sobel*, cuja filtragem é dada nas máscaras horizontal e vertical.
+
+=== Exercícios 14.2
+
+Neste exercício, vão ser aplicadas os filtros de convolução na câmera em diferentes matrizes: 11x11 e 21x21, ambas serão comparadas com a aplicação numa matriz 3x3. Considerando a quantidade considerável de valores para um grande quantidade de matrizes, foi preferível fazer laços _for_ para diferentes filtros, de forma que ficaram da forma abaixo:
+
+[cpp]
+----
+  const int size = 21;    //vou usar uma matriz tipo 21x21 para representar os filtros
+  float media[size][size];
+  // Preenchendo a matriz com o valor 1/441
+    float valor = 1.0f / (size * size);
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            media[i][j] = valor;
+        }
+    }
+ 
+  //Para gauss, vou precisar do desvio-padrão dado por sigma
+  const float sigma = 1.0f;
+  float gauss[size][size];
+  float sum = 0.0f;
+
+  // Calculando os valores com base na fórmula de Gauss
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // Coordenadas relativas ao centro da matriz
+            int x = i - size / 2;
+            int y = j - size / 2;
+
+            // Calculando o valor usando a fórmula de Gauss 2D
+            gauss[i][j] = (1.0f / (2.0f * M_PI * sigma * sigma)) *
+                          exp(-(x * x + y * y) / (2.0f * sigma * sigma));
+            sum += gauss[i][j];  // Acumulando para normalização
+        }
+    }
+
+    // Normalizando a matriz para que a soma seja 1
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            gauss[i][j] /= sum;  // Dividindo cada valor pela soma
+        }
+    }
+
+float horizontal[21][21] = {0};
+// Preencher o filtro Sobel horizontal
+    int center = 21 / 2; // Centro da matriz (linha do meio)
+
+    // Preencher as colunas à esquerda (valores negativos)
+    for (int i = 0; i < center; ++i) {
+        horizontal[i][center] = -(i + 1);  // Valores negativos (de -1 a -10)
+    }
+
+    // Preencher as colunas à direita (valores positivos)
+    for (int i = center + 1; i < 21; ++i) {
+        horizontal[i][center] = (i - center);  // Valores positivos (de +1 a +10)
+    }
+
+    // Preencher a coluna do meio com 0 (já inicializada como 0)
+    for (int i = 0; i < 21; ++i) {
+        horizontal[i][center] = 0;
+    }
+
+
+float vertical[21][21] = {0};
+// Preencher a matriz vertical
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 21; ++j) {
+            // Valor para a matriz vertical
+            int value = i - j;  // Definindo a diferença entre i e j
+            vertical[i][j] = value;
+        }
+    }
+
+
+
+float laplacian[21][21] = {0};  //iniciando a matriz com zero
+laplacian[center][center] = 20; //defino meu valor central como 20
+
+// Preencher as bordas com -1
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 21; ++j) {
+            // Preencho as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                laplacian[i][j] = -1;
+            }
+        }
+    }
+
+float boost[21][21] = {0};  //vou inicializá-lo com zero
+boost[center][center] = 5.2;    //valor central será 5.2
+
+
+    // Preencher as bordas com -1
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // Preencher as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                boost[i][j] = -1;
+            }
+        }
+    }
+----
+
+Conforme mostrado no trecho acima, os filtros utilizados foram de média, gaussiana, sobel (horizontal e vertical), boost (que tsmbém provoca o efeito de aguçamento). Através da biblioteca OpenCV, vou criar linhas voltadas para a máscara, mas antes disso crio variáveis para a captura dos frames em tons de cinza e com eles filtrados.
+
+[cpp]
+----
+  //Na mask, faço o procedimento padrão para construir a matriz a ser usada como máscara
+  cv::Mat frame, framegray, frame32f, frameFiltered;
+  cv::Mat mask(21, 21, CV_32F); 
+  cv::Mat result;
+  double width, height;
+  int absolut;
+  char key;
+
+  camera = cameraEnumerator();
+  cap.open(camera);
+  //cap.open("/dev/video0");  // abre a câmera
+
+  if (!cap.isOpened()) {
+    std::cout << "Câmera indisponível!" << std::endl;
+    return -1;
+  }
+
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
+  cv::namedWindow("filtroespacial", cv::WINDOW_NORMAL);
+  cv::namedWindow("original", cv::WINDOW_NORMAL);
+
+  mask = cv::Mat(21, 21, CV_32F, media); 
+  //mask recebe matrix 21x21 em ponto flutuante c/ valores iniciais = media
+
+  absolut = 1;  // calcula absoluto da imagem
+----
+
+Após fazer o for responsável pela captura de imagens na câmera, de fazer as conversões para tons de cinza e para os comandos de aplicação com os filtros, diferentes resultados foram obtidos. Fazendo primeiramente para o caso 11x11, os efeitos obtidos pela captura da câmera serão mostrados abaixo:
+
+[cols="1,1,1"]
+|===
+|image::media11x11.png[]
+|image::gaussiana11x11.png[]
+|image::laplaciano_absolutro11x11.png[]
+|===
+
+Abaixo os filtors de Sobel, horizontal e vertical:
+
+[cols="1,1"]
+|===
+|image::sobel_horizontal_absoluto11x11.png[]
+|image::sobel_vertical11x11.png[]
+|===
+
+O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:
+
+[cols="1,1,1"]
+|===
+|image::media_gaussiana3x3.png[]
+|image::boost3x3.png[]
+|image::laplaciano_3x3.png[]
+|===
+
+Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à medida que foram aumentando as matrizes, o borrão no filtro média aumentava, com o filtro gaussiano corringindo esse defeito. O efeito boost também é aplicado (que é a imagem do centro), que perde seu efeito no decorrer do aumento das matrizes. Os efeitos vistos nas matrizes de Sobel encontram-se abaixo:
+
+[cols="1,1"]
+|===
+|image::sobel_verticala3x3.png[]
+|image::sobel_horizontal3x3.png[]
+|===
+
+O código completo encontra-se abaixo:
+
+[cpp]
+----
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include <cmath>
+#include "camera.hpp"
+
+void printmask(cv::Mat &m) {
+    for (int i=0; i<m.size().height; i++) {
+        for (int j=0; j<m.size().width; j++) {
+            std::cout << m.at<float>(i, j) << ",";
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main(int, char**) {
+    cv::VideoCapture cap;
+  int camera;
+  const int size = 21;    //vou usar uma matriz tipo 21x21 para representar os filtros
+  float media[size][size];
+  // Preenchendo a matriz com o valor 1/441
+    float valor = 1.0f / (size * size);
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            media[i][j] = valor;
+        }
+    }
+ 
+  //Para gauss, vou precisar do desvio-padrão dado por sigma
+  const float sigma = 1.0f;
+  float gauss[size][size];
+  float sum = 0.0f;
+
+  // Calculando os valores com base na fórmula de Gauss
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // Coordenadas relativas ao centro da matriz
+            int x = i - size / 2;
+            int y = j - size / 2;
+
+            // Calculando o valor usando a fórmula de Gauss 2D
+            gauss[i][j] = (1.0f / (2.0f * M_PI * sigma * sigma)) *
+                          exp(-(x * x + y * y) / (2.0f * sigma * sigma));
+            sum += gauss[i][j];  // Acumulando para normalização
+        }
+    }
+
+    // Normalizando a matriz para que a soma seja 1
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            gauss[i][j] /= sum;  // Dividindo cada valor pela soma
+        }
+    }
+
+float horizontal[21][21] = {0};
+// Preencher o filtro Sobel horizontal
+    int center = 21 / 2; // Centro da matriz (linha do meio)
+
+    // Preencher as colunas à esquerda (valores negativos)
+    for (int i = 0; i < center; ++i) {
+        horizontal[i][center] = -(i + 1);  // Valores negativos (de -1 a -10)
+    }
+
+    // Preencher as colunas à direita (valores positivos)
+    for (int i = center + 1; i < 21; ++i) {
+        horizontal[i][center] = (i - center);  // Valores positivos (de +1 a +10)
+    }
+
+    // Preencher a coluna do meio com 0 (já inicializada como 0)
+    for (int i = 0; i < 21; ++i) {
+        horizontal[i][center] = 0;
+    }
+
+
+float vertical[21][21] = {0};
+// Preencher a matriz vertical
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 21; ++j) {
+            // Valor para a matriz vertical
+            int value = i - j;  // Definindo a diferença entre i e j
+            vertical[i][j] = value;
+        }
+    }
+
+
+
+float laplacian[21][21] = {0};  //iniciando a matriz com zero
+laplacian[center][center] = 20; //defino meu valor central como 20
+
+// Preencher as bordas com -1
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 21; ++j) {
+            // Preencho as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                laplacian[i][j] = -1;
+            }
+        }
+    }
+
+float boost[21][21] = {0};  //vou inicializá-lo com zero
+boost[center][center] = 5.2;    //valor central será 5.2
+
+
+    // Preencher as bordas com -1
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // Preencher as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                boost[i][j] = -1;
+            }
+        }
+    }
+
+
+  //Na mask, faço o procedimento padrão para construir a matriz a ser usada como máscara
+  cv::Mat frame, framegray, frame32f, frameFiltered;
+  cv::Mat mask(21, 21, CV_32F); 
+  cv::Mat result;
+  double width, height;
+  int absolut;
+  char key;
+
+  camera = cameraEnumerator();
+  cap.open(camera);
+  //cap.open("/dev/video0");  // abre a câmera
+
+  if (!cap.isOpened()) {
+    std::cout << "Câmera indisponível!" << std::endl;
+    return -1;
+  }
+
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
+  cv::namedWindow("filtroespacial", cv::WINDOW_NORMAL);
+  cv::namedWindow("original", cv::WINDOW_NORMAL);
+
+  mask = cv::Mat(21, 21, CV_32F, media); 
+  //mask recebe matrix 21x21 em ponto flutuante c/ valores iniciais = media
+
+  absolut = 1;  // calcula absoluto da imagem
+
+  for (;;) {
+    cap >> frame;  // captura nova imagem da camera
+    //capturo as imagens coloridas de forma constante na matriz cap e converto em tons de cinza abaixo
+    cv::cvtColor(frame, framegray, cv::COLOR_BGR2GRAY);
+    cv::flip(framegray, framegray, 1); //flip inverte a imagem horizontalmente
+    cv::imshow("original", framegray);
+    framegray.convertTo(frame32f, CV_32F);
+    cv::filter2D(frame32f, frameFiltered, frame32f.depth(), mask, cv::Point(1, 1), cv::BORDER_REPLICATE);
+    if (absolut) {
+      frameFiltered = cv::abs(frameFiltered);
+    }
+
+    frameFiltered.convertTo(result, CV_8U);
+
+    cv::imshow("filtroespacial", result);
+
+    key = (char)cv::waitKey(10);
+    if (key == 27) break;  // tecla ESC pressionada!
+    switch (key) {
+      case 'a':
+        absolut = !absolut;
+        break;
+      case 'm':
+        mask = cv::Mat(21, 21, CV_32F, media);
+        printmask(mask);
+        break;
+      case 'g':
+        mask = cv::Mat(21, 21, CV_32F, gauss);
+        printmask(mask);
+        break;
+      case 'h':
+        mask = cv::Mat(21, 21, CV_32F, horizontal);
+        printmask(mask);
+        break;
+      case 'v':
+        mask = cv::Mat(21, 21, CV_32F, vertical);
+        printmask(mask);
+        break;
+      case 'l':
+        mask = cv::Mat(21, 21, CV_32F, laplacian);
+        printmask(mask);
+        break;
+      case 'b':
+        mask = cv::Mat(21, 21, CV_32F, boost);
+        break;
+      default:
+        break;
+    }
+  }
+  return 0;
+}
+----
+
+
