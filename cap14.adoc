@@ -168,8 +168,8 @@ Abaixo os filtors de Sobel, horizontal e vertical:
 [role="image-row"]
 ++++
 <div style="display: flex; justify-content: space-between;">
-  <img src="sobel_horizontal_absoluto11x11.png" alt="Sobel horizontal (absol) 11x11" style="width: 30%;"/>
-  <img src="sobel_vertical11x11.png" alt="Sobel vertical 11x11" style="width: 30%;"/>
+  <img src="sobel_horizontal_absoluto11x11.png" alt="Sobel horizontal (absol) 11x11" style="width: 40%;"/>
+  <img src="sobel_vertical11x11.png" alt="Sobel vertical 11x11" style="width: 40%;"/>
 </div>
 ++++
 
