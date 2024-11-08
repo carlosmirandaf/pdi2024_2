@@ -18,6 +18,7 @@ No caso de uma imagem, a convolução é trabalhada no espaço. Portanto uma con
 
 Neste exercício, vão ser aplicadas os filtros de convolução na câmera em diferentes matrizes: 11x11 e 21x21, ambas serão comparadas com a aplicação numa matriz 3x3. Considerando a quantidade considerável de valores para um grande quantidade de matrizes, foi preferível fazer laços _for_ para diferentes filtros, de forma que ficaram da forma abaixo:
 
+
 [cpp]
 ----
   const int size = 21;    //vou usar uma matriz tipo 21x21 para representar os filtros
@@ -116,7 +117,9 @@ boost[center][center] = 5.2;    //valor central será 5.2
     }
 ----
 
+
 Conforme mostrado no trecho acima, os filtros utilizados foram de média, gaussiana, sobel (horizontal e vertical), boost (que tsmbém provoca o efeito de aguçamento). Através da biblioteca OpenCV, vou criar linhas voltadas para a máscara, mas antes disso crio variáveis para a captura dos frames em tons de cinza e com eles filtrados.
+
 
 [cpp]
 ----
@@ -170,6 +173,7 @@ Abaixo os filtors de Sobel, horizontal e vertical:
 </div>
 ++++
 
+
 O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:
 
 [role="image-row"]
@@ -181,7 +185,10 @@ O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a d
 </div>
 ++++
 
+
+
 Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à medida que foram aumentando as matrizes, o borrão no filtro média aumentava e o filtro gaussiano corrigia esse defeito. O efeito boost também é aplicado no 3x3 (que é a imagem do centro), que perde seu efeito no decorrer do aumento das matrizes. Os efeitos vistos nas matrizes de Sobel encontram-se abaixo:
+
 
 [role="image-row"]
 ++++
@@ -190,6 +197,8 @@ Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à m
   <img src="sobel_horizontal3x3.png" alt="Sobel horizontal 3x3" style="width: 40%;"/>
 </div>
 ++++
+
+
 
 O código completo encontra-se abaixo:
 
