@@ -173,10 +173,18 @@ O efeito que a equalização provoca na imagem é de pegar os tons de cinza do h
 
 Outras imagens tiradas pelo efeito da equalização encontram-se abaixo:
 
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="imagem equalizada_screenshot_02.11.2024[4].png.png" alt="Imagem equalizada 1" style="width: 30%;"/>
+  <img src="imagem equalizada_screenshot_02.11.2024[3].png" alt="Imagem equalizada 2" style="width: 30%;"/>
+</div>
+++++
+
 [cols="1,1"]
 |===
-|image::imagem equalizada_screenshot_02.11.2024[4].png[]
-|image::imagem equalizada_screenshot_02.11.2024[3].png[]
+|image::[]
+|image::.png[]
 |===
 
 O código completo com o efeito de equalização:

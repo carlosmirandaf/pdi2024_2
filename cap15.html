@@ -442,48 +442,396 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_15_filtragem_no_domínio_espacial_2_tilt_shift">Cap 15 - Filtragem no domínio espacial 2 - Tilt-shift</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>O <em>tiltshift</em> é uma técnica fotográfica que usa deslocamentos e rotações entre a lente e o plano de percepção (nde fica filme fotográfico ou o sensor da câmera) de modo a desfocar seletivamente regiões do assunto.</p>
+</div>
+<div class="sect2">
+<h3 id="_exercícios_15_2">Exercícios 15.2</h3>
+<div class="paragraph">
+<p>O programa será ajustado para regular a altura da região central que entrará em foco, a força de decaimento da região borrada e a posição vertical do centro da região que entrará em foco.</p>
+</div>
+<div class="paragraph">
+<p>Primeiramente foram introduzidas variáveis que vão representar o valor mínimo e máximo das condições pedidas, neste caso os valores voltados para a região e o borramento (chamado aqui de <em>blur</em>), conforme mostrado no trecho abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>//Parte do foco na altura
+int focus_altura_slider = 0;
+int focus_altura_slider_max = 100;
+
+//Parte da força do decaimento da região borrada
+int blur_slider = 0;
+int blur_slider_max = 100;
+
+//Parte do foco na região central
+int focus_centro_slider = 0;
+int focus_centro_slider_max = 100;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para os efeitos, cálculos voltados para a região foram introduzidos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>int regiao_altura = focus_altura_slider * image2.rows/100;
+int regiao_centro_y = focus_centro_slider * image2.rows/100;
+
+int limit = top_slider*255/100;
+  if(limit &gt; 0){
+    cv::Mat tmp = image2(cv::Rect(0, regiao_centro_y - regiao_altura/2, 256, regiao_altura));
+    tmp.copyTo(imageTop(cv::Rect(0, regiao_centro_y - regiao_altura/2, 256, regiao_altura)));
+  }
+
+//Com o blur acima, aplico o borramento na imagem(desfoque)
+int blur = blur_slider * 2 + 1;  //Fator de ajuste
+  if (blur &gt; 1) {
+    cv::GaussianBlur(imageTop, imageTop, cv::Size(blur, blur), 0);
+  }</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dentro da main, novas barras voltadas para as suas modificações foram introduzidas:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  // Controle deslizante para a altura da região em foco
+  std::sprintf( TrackbarName, "Focus height x %d", focus_altura_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;focus_altura_slider,
+                      focus_altura_slider_max,
+                      on_trackbar_line );
+
+  //Fazendo o controle para o centro da região em foco
+  std::sprintf( TrackbarName, "Focus height Y x %d", focus_centro_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;focus_centro_slider,
+                      focus_centro_slider_max,
+                      on_trackbar_line );
+
+  //Para o borramento (blur)
+  std::sprintf( TrackbarName, "Blur x %d", blur_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;blur_slider,
+                      blur_slider_max,
+                      on_trackbar_line );</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Como resultado, um exemplo de imagem com os efeitos descritos encontra-se abaixo:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="blur_height_center.png" alt="blur height center">
+</div>
+</div>
+<div class="paragraph">
+<p>O código completo encontra-se abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+double alfa;
+int alfa_slider = 0;
+int alfa_slider_max = 100;
+
+int top_slider = 0;
+int top_slider_max = 100;
+
+//Parte do foco na altura
+int focus_altura_slider = 0;
+int focus_altura_slider_max = 100;
+
+//Parte da força do decaimento da região borrada
+int blur_slider = 0;
+int blur_slider_max = 100;
+
+//Parte do foco na região central
+int focus_centro_slider = 0;
+int focus_centro_slider_max = 100;
+
+cv::Mat image1, image2, blended;
+cv::Mat imageTop;
+
+char TrackbarName[50];
+
+void on_trackbar_blend(int, void*){
+ alfa = (double) alfa_slider/alfa_slider_max ;
+ cv::addWeighted(image1, 1-alfa, imageTop, alfa, 0.0, blended);
+ cv::imshow("addweighted", blended);
+}
+
+void on_trackbar_line(int, void*){
+  //image1.copyTo(imageTop);
+  image2.copyTo(imageTop);
+  //Ajuste da altura da região em foco
+  int regiao_altura = focus_altura_slider * image2.rows/100;
+  int regiao_centro_y = focus_centro_slider * image2.rows/100;
+
+  int limit = top_slider*255/100;
+  if(limit &gt; 0){
+    cv::Mat tmp = image2(cv::Rect(0, regiao_centro_y - regiao_altura/2, 256, regiao_altura));
+    tmp.copyTo(imageTop(cv::Rect(0, regiao_centro_y - regiao_altura/2, 256, regiao_altura)));
+  }
+
+  //Com o blur acima, aplico o borramento na imagem(desfoque)
+  int blur = blur_slider * 2 + 1;  //Fator de ajuste
+  if (blur &gt; 1) {
+    cv::GaussianBlur(imageTop, imageTop, cv::Size(blur, blur), 0);
+  }
+
+  on_trackbar_blend(alfa_slider,0);
+}
+
+int main(int argvc, char** argv){
+  image1 = cv::imread(argv[1]);
+  image2 = cv::imread(argv[2]);
+  image2.copyTo(imageTop);
+  cv::namedWindow("addweighted", 1);
+
+  std::sprintf( TrackbarName, "Alpha x %d", alfa_slider_max );
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;alfa_slider,
+                      alfa_slider_max,
+                      on_trackbar_blend );
+  on_trackbar_blend(alfa_slider, 0 );
+
+  // Controle deslizante para a altura da região em foco
+  std::sprintf( TrackbarName, "Focus height x %d", focus_altura_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;focus_altura_slider,
+                      focus_altura_slider_max,
+                      on_trackbar_line );
+
+  //Fazendo o controle para o centro da região em foco
+  std::sprintf( TrackbarName, "Focus height Y x %d", focus_centro_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;focus_centro_slider,
+                      focus_centro_slider_max,
+                      on_trackbar_line );
+
+  //Para o borramento (blur)
+  std::sprintf( TrackbarName, "Blur x %d", blur_slider_max);
+  cv::createTrackbar( TrackbarName, "addweighted",
+                      &amp;blur_slider,
+                      blur_slider_max,
+                      on_trackbar_line );
+
+  cv::waitKey(0);
+  return 0;
+}</pre>
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
+<div class="sect2">
+<h3 id="_exercícios_15_3">Exercícios 15.3</h3>
+<div class="paragraph">
+<p>Aplicando os efeitos obtidos acima, pede-se para fazer um vídeo com a aplicação do efeito stop-motion nele. Os efeitos terão que percorrer nos pixels das imagens, de forma que serão criadas linhas e colunas para ela. Uma característica desse efeito é o foco na parte central de um vídeo, de forma que o que se encontra ao redor dele estará borrado, daí o efeito blur é aplicado nele, conforme mostrado no trecho a seguir:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    //Criando a máscara de foco central
+    int rows = image.rows;
+    int cols = image.cols;
+
+    //A máscara terá uma região em foco (desfoque)
+    cv::Mat mask = cv::Mat::zeros(image.size() ,CV_32F);
+
+    //Área central do foco
+    int top = std::max(0, focus_centro - focus_altura / 2);
+    int bottom = std::min(rows, focus_centro + focus_altura / 2);
+
+    //Criando a região central em foco
+    mask(cv::Rect(0, top, cols, bottom-top)) = 1.0;
+
+    //No stop-motion, as regiões fora do centro estarão desfocadas, aplico blur nelas
+    cv::Mat blurred;
+    cv::GaussianBlur(image, blurred, cv::Size(blur, blur), 0);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Percorrendo os pixels das imagens, os efeitos descritos acimas serão combinados:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    // Combina imagem original com desfoque baseado na máscara
+    for (int r = 0; r &lt; rows; r++) {
+        for (int c = 0; c &lt; cols; c++) {
+            if (mask.at&lt;float&gt;(r, c) &lt; 1.0) {
+                image.at&lt;cv::Vec3b&gt;(r, c) = blurred.at&lt;cv::Vec3b&gt;(r, c);
+            }
+        }
+    }</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Na main, serão definidas as configurações de vídeo na saída, a intensidade do efeito borrão e os valores da altura e do centro da região em foco:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  //Vou definir as configurações de vídeo na saída
+  int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+  double fps = 10; // Taxa de quadros (stop motion com uma taxa baixa)
+  cv::Size frame_size(image1.cols, image1.rows); // Tamanho dos quadros
+  cv::VideoWriter video_writer("output_tilt_shift.avi", fourcc, fps, frame_size);
+
+  // Definir parâmetros do efeito
+  int focus_altura = 100; // Altura da região em foco
+  int focus_centro = image1.rows / 2; // Centro da região em foco
+  int blur = 21; // Intensidade do desfoque (deve ser ímpar)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Após essa etapa, um laço for é utilizado para salvar os quadros e aplicar o efeito tilt-shift no vídeo</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    for (int i = 0; i &lt; 100; ++i) {
+        // Ajustar a posição e a altura do foco de acordo com o quadro
+        focus_centro = image1.rows / 2 + (i % 10) * 10;
+
+        // Aplica o efeito tilt-shift na imagem
+        cv::Mat current_frame = image2.clone();
+        efeito_tiltshift(current_frame, focus_altura, focus_centro, blur);
+
+        // Escrever o quadro no arquivo de vídeo
+        video_writer.write(current_frame);
+
+        // Descartar quadros a cada 2 iterações para criar o efeito de stop motion
+        if (i % 2 != 0) {
+            continue;
+        }
+    }</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O vídeo com os efeitos aplicados encontra-se abaixo:</p>
+</div>
+<div class="paragraph">
+<p>media::output_tilt_shift.avi[]</p>
+</div>
+<div class="paragraph">
+<p>O código completo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+double alfa;
+int alfa_slider = 0;
+int alfa_slider_max = 100;
+
+int top_slider = 0;
+int top_slider_max = 100;
+
+cv::Mat image1, image2, blended;
+cv::Mat imageTop;
+
+char TrackbarName[50];
+
+void on_trackbar_blend(int, void*){
+ alfa = (double) alfa_slider/alfa_slider_max ;
+ cv::addWeighted(image1, 1-alfa, imageTop, alfa, 0.0, blended);
+ cv::imshow("addweighted", blended);
+}
+
+void on_trackbar_line(int, void*){
+  image1.copyTo(imageTop);
+  int limit = top_slider*255/100;
+  if(limit &gt; 0){
+    cv::Mat tmp = image2(cv::Rect(0, 0, 256, limit));
+    tmp.copyTo(imageTop(cv::Rect(0, 0, 256, limit)));
+  }
+  on_trackbar_blend(alfa_slider,0);
+}
+
+void efeito_tiltshift(cv::Mat&amp; image, int focus_altura, int focus_centro, int blur) {
+    //Criando a máscara de foco central
+    int rows = image.rows;
+    int cols = image.cols;
+
+    //A máscara terá uma região em foco (desfoque)
+    cv::Mat mask = cv::Mat::zeros(image.size() ,CV_32F);
+
+    //Área central do foco
+    int top = std::max(0, focus_centro - focus_altura / 2);
+    int bottom = std::min(rows, focus_centro + focus_altura / 2);
+
+    //Criando a região central em foco
+    mask(cv::Rect(0, top, cols, bottom-top)) = 1.0;
+
+    //No stop-motion, as regiões fora do centro estarão desfocadas, aplico blur nelas
+    cv::Mat blurred;
+    cv::GaussianBlur(image, blurred, cv::Size(blur, blur), 0);
+
+    // Combina imagem original com desfoque baseado na máscara
+    for (int r = 0; r &lt; rows; r++) {
+        for (int c = 0; c &lt; cols; c++) {
+            if (mask.at&lt;float&gt;(r, c) &lt; 1.0) {
+                image.at&lt;cv::Vec3b&gt;(r, c) = blurred.at&lt;cv::Vec3b&gt;(r, c);
+            }
+        }
+    }
+}
+
+int main(int argvc, char** argv){
+  image1 = cv::imread(argv[1]);
+  image2 = cv::imread(argv[2]);
+  image2.copyTo(imageTop);
+
+  //Vou definir as configurações de vídeo na saída
+  int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+  double fps = 10; // Taxa de quadros (stop motion com uma taxa baixa)
+  cv::Size frame_size(image1.cols, image1.rows); // Tamanho dos quadros
+  cv::VideoWriter video_writer("output_tilt_shift.avi", fourcc, fps, frame_size);
+
+  // Definir parâmetros do efeito
+  int focus_altura = 100; // Altura da região em foco
+  int focus_centro = image1.rows / 2; // Centro da região em foco
+  int blur = 21; // Intensidade do desfoque (deve ser ímpar)
+
+  // Aplicar o efeito Tilt-Shift e salvar os quadros
+    for (int i = 0; i &lt; 100; ++i) {
+        // Ajustar a posição e a altura do foco de acordo com o quadro
+        focus_centro = image1.rows / 2 + (i % 10) * 10;
+
+        // Aplica o efeito tilt-shift na imagem
+        cv::Mat current_frame = image2.clone();
+        efeito_tiltshift(current_frame, focus_altura, focus_centro, blur);
+
+        // Escrever o quadro no arquivo de vídeo
+        video_writer.write(current_frame);
+
+        // Descartar quadros a cada 2 iterações para criar o efeito de stop motion
+        if (i % 2 != 0) {
+            continue;
+        }
+    }
+
+    // Liberar o vídeo
+    video_writer.release();
+
+    std::cout &lt;&lt; "Vídeo salvo como output_tilt_shift.avi" &lt;&lt; std::endl;
+
+  //cv::waitKey(0);
+  return 0;
+}</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-08 14:45:20 -0300
+Last updated 2024-11-08 14:44:53 -0300
 </div>
 </div>
 </body>
