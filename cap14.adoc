@@ -151,20 +151,24 @@ Conforme mostrado no trecho acima, os filtros utilizados foram de média, gaussi
 
 Após fazer o for responsável pela captura de imagens na câmera, de fazer as conversões para tons de cinza e para os comandos de aplicação com os filtros, diferentes resultados foram obtidos. Fazendo primeiramente para o caso 11x11, os efeitos obtidos pela captura da câmera serão mostrados abaixo:
 
-[cols="1,1,1"]
-|===
-|image::media11x11.png[]
-|image::gaussiana11x11.png[]
-|image::laplaciano_absolutro11x11.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="media11x11.png" alt="Filtro média 11x11" style="width: 30%;"/>
+  <img src="gaussiana11x11.png" alt="Filtro gaussiana 11x11" style="width: 30%;"/>
+  <img src="laplaciano_absolutro11x11.png" alt="Laplaciano (absolut) 11x11" style="width: 30%;"/>
+</div>
+++++
 
 Abaixo os filtors de Sobel, horizontal e vertical:
 
-[cols="1,1"]
-|===
-|image::sobel_horizontal_absoluto11x11.png[]
-|image::sobel_vertical11x11.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="sobel_horizontal_absoluto11x11.png" alt="Sobel horizontal (absol) 11x11" style="width: 30%;"/>
+  <img src="sobel_vertical11x11.png" alt="Sobel vertical 11x11" style="width: 30%;"/>
+</div>
+++++
 
 O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:
 
