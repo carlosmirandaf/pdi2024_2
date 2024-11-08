@@ -443,195 +443,178 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_cap_12_manipulação_de_histograma">Cap 12 - Manipulação de histograma</h2>
+<h2 id="_cap_14_filtragem_no_domínio_espacial_1_convolução">Cap 14 - Filtragem no domínio espacial 1 - Convolução</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Dentro do processamento digital de imagens, usa-se o histograma para obter informações da frequência em que os tons de cinza estão registrados na imagem. Partindo daí, pode-se usar algumas técnicas de melhora da imagem, dentre elas usa-se a <strong>equalização</strong>.</p>
+<p>Uma das formas mais utilizadas para correção de tons de cinza de uma imagem é a equalização, que por sua vez usa o histograma para fazer o espalhamento desses tons nela. No entanto, ela é uma forma sujeita a problemas de falso contorno, que é considerado indesejado na obtenção de um resultado satisfatório. Para evitar este tipo de defeito, recorre-se a técnicas de filtragem para obter a captura de uma imagem para evitá-la junto com outros elementos indesejados, como ruídos.</p>
+</div>
+<div class="paragraph">
+<p>Enquanto a equalização, mostrada no capítulo 12, lida com apenas 1 pixel, a técnica mostrada aqui, chamada <strong>convolução</strong>, utiliza-se dos seus vizinhos para filtrar uma imagem ou vídeo. Para isso, ela precisa de uma quantidade A e uma quantidade B, agrega-se a ambas através de um sinal e combinando-as no domínio do tempo, considerando que elas sejam sinais. Em forma de equação:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>f(x) * g(x) = \int_{-\infty}^{+\infty} f(\alpha) \cdot g(x - \alpha) \, d\alpha</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No caso de uma imagem, a convolução é trabalhada no espaço. Portanto uma convolução digital trabalha com o <strong>processo de filtragem linear com máscara</strong>. Com as máscaras, pode-se projetar diferentes efeitos, muitos deles voltados para o borramento ou aguçamento, se uma imagem original possui muitas descontinuidades, o aguçamento aumenta. Dentre os filtros usados para efeito de borramento, encontram-se os filtros <strong>média</strong> e <strong>gaussiana</strong>. Efeitos voltados para aguçamento são o <strong>laplaciano</strong> e o <strong>Sobel</strong>, cuja filtragem é dada nas máscaras horizontal e vertical.</p>
 </div>
 <div class="sect2">
-<h3 id="_exercício_12_2">Exercício 12.2</h3>
+<h3 id="_exercícios_14_2">Exercícios 14.2</h3>
 <div class="paragraph">
-<p>Através do uso da câmera, foi feito um algoritmo que usa a biblioteca OpenCV para aplicar as técnicas de histograma e de equalização da imagem. A câmera utilizada aqui foi uma de celular e que esteve conectada ao computador através do programa DroidCam. Para que o seu uso nesta atividade tivesse êxito, foi feito um código hpp para a câmera, conforme encontra-se abaixo:</p>
+<p>Neste exercício, vão ser aplicadas os filtros de convolução na câmera em diferentes matrizes: 11x11 e 21x21, ambas serão comparadas com a aplicação numa matriz 3x3. Considerando a quantidade considerável de valores para um grande quantidade de matrizes, foi preferível fazer laços <em>for</em> para diferentes filtros, de forma que ficaram da forma abaixo:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>#ifndef CAMERA_HPP
-#define CAMERA_HPP
+<pre>  const int size = 21;    //vou usar uma matriz tipo 21x21 para representar os filtros
+  float media[size][size];
+  // Preenchendo a matriz com o valor 1/441
+    float valor = 1.0f / (size * size);
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            media[i][j] = valor;
+        }
+    }
 
-#include &lt;opencv2/opencv.hpp&gt;
-#include &lt;iostream&gt;
+  //Para gauss, vou precisar do desvio-padrão dado por sigma
+  const float sigma = 1.0f;
+  float gauss[size][size];
+  float sum = 0.0f;
 
-// Função que enumera as câmeras disponíveis e retorna o ID da primeira câmera conectada
-int cameraEnumerator();
+  // Calculando os valores com base na fórmula de Gauss
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            // Coordenadas relativas ao centro da matriz
+            int x = i - size / 2;
+            int y = j - size / 2;
 
-class Camera {
-public:
-    Camera(int deviceID = 0);  // Construtor: deviceID padrão é 0
-    ~Camera();
+            // Calculando o valor usando a fórmula de Gauss 2D
+            gauss[i][j] = (1.0f / (2.0f * M_PI * sigma * sigma)) *
+                          exp(-(x * x + y * y) / (2.0f * sigma * sigma));
+            sum += gauss[i][j];  // Acumulando para normalização
+        }
+    }
 
-    bool open();
-    bool captureFrame(cv::Mat &amp;frame);
-    int getWidth() const;
-    int getHeight() const;
-    void close();
+    // Normalizando a matriz para que a soma seja 1
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            gauss[i][j] /= sum;  // Dividindo cada valor pela soma
+        }
+    }
 
-private:
-    int deviceID;
-    int width;
-    int height;
-    cv::VideoCapture cap;
-};
+float horizontal[21][21] = {0};
+// Preencher o filtro Sobel horizontal
+    int center = 21 / 2; // Centro da matriz (linha do meio)
 
-#endif // CAMERA_HPP</pre>
+    // Preencher as colunas à esquerda (valores negativos)
+    for (int i = 0; i &lt; center; ++i) {
+        horizontal[i][center] = -(i + 1);  // Valores negativos (de -1 a -10)
+    }
+
+    // Preencher as colunas à direita (valores positivos)
+    for (int i = center + 1; i &lt; 21; ++i) {
+        horizontal[i][center] = (i - center);  // Valores positivos (de +1 a +10)
+    }
+
+    // Preencher a coluna do meio com 0 (já inicializada como 0)
+    for (int i = 0; i &lt; 21; ++i) {
+        horizontal[i][center] = 0;
+    }
+
+
+float vertical[21][21] = {0};
+// Preencher a matriz vertical
+    for (int i = 0; i &lt; 21; ++i) {
+        for (int j = 0; j &lt; 21; ++j) {
+            // Valor para a matriz vertical
+            int value = i - j;  // Definindo a diferença entre i e j
+            vertical[i][j] = value;
+        }
+    }
+
+
+
+float laplacian[21][21] = {0};  //iniciando a matriz com zero
+laplacian[center][center] = 20; //defino meu valor central como 20
+
+// Preencher as bordas com -1
+    for (int i = 0; i &lt; 21; ++i) {
+        for (int j = 0; j &lt; 21; ++j) {
+            // Preencho as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                laplacian[i][j] = -1;
+            }
+        }
+    }
+
+float boost[21][21] = {0};  //vou inicializá-lo com zero
+boost[center][center] = 5.2;    //valor central será 5.2
+
+
+    // Preencher as bordas com -1
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            // Preencher as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                boost[i][j] = -1;
+            }
+        }
+    }</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Com o arquivo "camera.hpp" no mesmo arquivo do código, foi possível dar continuidade aos testes com a câmera. No código, a priori, como a imagem registrada é colorida, foi feito um comando para colocar o vídeo em tons de cinza. Aqui o número de bits trabalhado foi de 64 bits e foram usados 256 tons de cinza, conforme mostrado o trecho abaixo:</p>
+<p>Conforme mostrado no trecho acima, os filtros utilizados foram de média, gaussiana, sobel (horizontal e vertical), boost (que tsmbém provoca o efeito de aguçamento). Através da biblioteca OpenCV, vou criar linhas voltadas para a máscara, mas antes disso crio variáveis para a captura dos frames em tons de cinza e com eles filtrados.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>  cv::Mat image, grayImage, equalizedImage, histogramImage;
-  int width, height;
-  int camera;
-  cv::VideoCapture cap;
-  std::vector&lt;cv::Mat&gt; planes;
-  //cv::Mat histR, histG, histB;
-  cv::Mat hist; //para o histograma, não vou ter mais as cores
-  int nbins = 64;
-  float range[] = {0, 255};
-  const float *histrange = { range };
-  bool uniform = true;
-  bool acummulate = false;
-  int key;</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Para esta atividade, foi feito um código que pegue o vídeo com os tons de cinza sem o efeito da equalização e em seguida outro feito para passar esse efeito. Para o código da equalização, o código feito encontra-se adiante:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>#include &lt;iostream&gt;
-#include &lt;opencv2/opencv.hpp&gt;
-#include "camera.hpp"
+<pre>  //Na mask, faço o procedimento padrão para construir a matriz a ser usada como máscara
+  cv::Mat frame, framegray, frame32f, frameFiltered;
+  cv::Mat mask(21, 21, CV_32F);
+  cv::Mat result;
+  double width, height;
+  int absolut;
+  char key;
 
-int main(int argc, char** argv){
-    //vou criar uma função chamada grayImage para as imagens em tons de cinza
-  cv::Mat image, grayImage, equalizedImage, histogramImage;
-  int width, height;
-  int camera;
-  cv::VideoCapture cap;
-  std::vector&lt;cv::Mat&gt; planes;
-  //cv::Mat histR, histG, histB;
-  cv::Mat hist; //para o histograma, não vou ter mais as cores
-  int nbins = 64;
-  float range[] = {0, 255};
-  const float *histrange = { range };
-  bool uniform = true;
-  bool acummulate = false;
-  int key;
+  camera = cameraEnumerator();
+  cap.open(camera);
+  //cap.open("/dev/video0");  // abre a câmera
 
-  //camera = cameraEnumerator();
-  //cap.open(camera);
-  cap.open("/dev/video0");  //para abrir a câmera no meu caso com a ajuda do DroidCam
-
-  if(!cap.isOpened()){
-    std::cout &lt;&lt; "cameras indisponiveis";
+  if (!cap.isOpened()) {
+    std::cout &lt;&lt; "Câmera indisponível!" &lt;&lt; std::endl;
     return -1;
   }
 
   cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-  width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-  height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-  std::cout &lt;&lt; "largura = " &lt;&lt; width &lt;&lt; std::endl;
-  std::cout &lt;&lt; "altura  = " &lt;&lt; height &lt;&lt; std::endl;
+  cv::namedWindow("filtroespacial", cv::WINDOW_NORMAL);
+  cv::namedWindow("original", cv::WINDOW_NORMAL);
 
-  int histw = nbins, histh = nbins/2;
-  histogramImage = cv::Mat(histh, histw, CV_8UC3, cv::Scalar(0,0,0));
+  mask = cv::Mat(21, 21, CV_32F, media);
+  //mask recebe matrix 21x21 em ponto flutuante c/ valores iniciais = media
 
-  while(1){
-    cap &gt;&gt; image;
-    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY); //conversão agora para os tons de cinza
-    cv::equalizeHist(grayImage, equalizedImage);        //equalização do histograma aplicado
-
-    //Em seguida, vou fazer o cálculo do histograma
-    cv::calcHist(&amp;equalizedImage, 1, 0, cv::Mat(), hist, 1,
-                 &amp;nbins, &amp;histrange, uniform, acummulate);
-
-    cv::normalize(hist, hist, 0, histogramImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-    histogramImage.setTo(cv::Scalar(0));
-
-    //Aqui é feito o desenho do gráfico do histograma
-    for(int i=0; i&lt;nbins; i++){
-      cv::line(histogramImage,
-               cv::Point(i, histh),
-               cv::Point(i, histh-cvRound(hist.at&lt;float&gt;(i))),
-               cv::Scalar(0, 0, 255), 1, 8, 0);
-    }
-
-    cv::cvtColor(equalizedImage, equalizedImage, cv::COLOR_GRAY2BGR);
-    histogramImage.copyTo(equalizedImage(cv::Rect(0, 0, nbins, histh)));
-    cv::imshow("imagem equalizada", equalizedImage);
-    key = cv::waitKey(30);
-    if(key == 27) break;
-  }
-  return 0;
-}</pre>
+  absolut = 1;  // calcula absoluto da imagem</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Primeiro faço a conversão dos tons coloridos do vídeo para os tons de cinza e na próxima linha, aplico a imagem equalizada. Depois disso, faço o cálculo do histograma:</p>
+<p>Após fazer o for responsável pela captura de imagens na câmera, de fazer as conversões para tons de cinza e para os comandos de aplicação com os filtros, diferentes resultados foram obtidos. Fazendo primeiramente para o caso 11x11, os efeitos obtidos pela captura da câmera serão mostrados abaixo:</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY); //conversão agora para os tons de cinza
-    cv::equalizeHist(grayImage, equalizedImage);        //equalização do histograma aplicado
-
-    //Em seguida, vou fazer o cálculo do histograma
-    cv::calcHist(&amp;equalizedImage, 1, 0, cv::Mat(), hist, 1,
-                 &amp;nbins, &amp;histrange, uniform, acummulate);
-
-    cv::normalize(hist, hist, 0, histogramImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-    histogramImage.setTo(cv::Scalar(0));</pre>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::media11x11.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::gaussiana11x11.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::laplaciano_absolutro11x11.png[]</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
-<p>O calcHist do código pega respectivamente a referência, a quantidade de imagens do histograma, o ponteiro para o array de canal de imagens, másc. para marcar a região do cálculo do histograma, array para armazenar o histograma, a dimensionalidade do histograma, o endereço da variável que armazena a quantidade de divisões e as variáveis informando se o histograma é uniforme. Caso a variável não seja uniforme, a variável histrange deverá passar uma lista com os limites superiores de cada faixa.</p>
-</div>
-<div class="paragraph">
-<p>Após o cálculo do histograma, ele será normalizado na faixa de valores que vai de 0 até a quantidade de linhas da imagem onde será desenhado. O trecho do código que representa o desenho do gráfico do histograma encontra-se abaixo:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>for(int i=0; i&lt;nbins; i++){
-      cv::line(histogramImage,
-               cv::Point(i, histh),
-               cv::Point(i, histh-cvRound(hist.at&lt;float&gt;(i))),
-               cv::Scalar(0, 0, 255), 1, 8, 0);
-    }
-    cv::cvtColor(equalizedImage, equalizedImage, cv::COLOR_GRAY2BGR);
-    histogramImage.copyTo(equalizedImage(cv::Rect(0, 0, nbins, histh)));
-    cv::imshow("imagem equalizada", equalizedImage);
-    key = cv::waitKey(30);
-    if(key == 27) break;</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O resultado, colocado lado-a-lado com outro código feito à parte para a representação do vídeo em tons de cinza sem efeito de equalização encontra-se abaixo:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="equalize_grayscale.png" alt="equalize grayscale">
-</div>
-</div>
-<div class="paragraph">
-<p>O efeito que a equalização provoca na imagem é de pegar os tons de cinza do histograma e fazer um espalhamento dos seus valores na imagem. A consequência desse efeito é uma distribuição uniforme desses tons na imagem. Na imagem à esquerda está a imagem sob o efeito, é notado uma certa atenuação nos tons de cinza, porém uma das desvantagens é que essa distribuição também pode resultar em problemas de falso contorno, o que está explícito quando a equalização tenta fazer isso com o efeito dos tons claros ocasionados pela luz presente na foto.</p>
-</div>
-<div class="paragraph">
-<p>Outras imagens tiradas pelo efeito da equalização encontram-se abaixo:</p>
+<p>Abaixo os filtors de Sobel, horizontal e vertical:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -640,160 +623,239 @@ int main(int argc, char** argv){
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::imagem equalizada_screenshot_02.11.2024[4].png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::imagem equalizada_screenshot_02.11.2024[3].png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_horizontal_absoluto11x11.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_vertical11x11.png[]</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>O código completo com o efeito de equalização:</p>
+<p>O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::media_gaussiana3x3.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::boost3x3.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::laplaciano_3x3.png[]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à medida que foram aumentando as matrizes, o borrão no filtro média aumentava, com o filtro gaussiano corringindo esse defeito. O efeito boost também é aplicado (que é a imagem do centro), que perde seu efeito no decorrer do aumento das matrizes. Os efeitos vistos nas matrizes de Sobel encontram-se abaixo:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_verticala3x3.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_horizontal3x3.png[]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>O código completo encontra-se abaixo:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre>#include &lt;iostream&gt;
 #include &lt;opencv2/opencv.hpp&gt;
+#include &lt;cmath&gt;
 #include "camera.hpp"
 
-int main(int argc, char** argv){
-    //vou criar uma função chamada grayImage para as imagens em tons de cinza
-  cv::Mat image, grayImage, equalizedImage, histogramImage;
-  int width, height;
+void printmask(cv::Mat &amp;m) {
+    for (int i=0; i&lt;m.size().height; i++) {
+        for (int j=0; j&lt;m.size().width; j++) {
+            std::cout &lt;&lt; m.at&lt;float&gt;(i, j) &lt;&lt; ",";
+        }
+        std::cout &lt;&lt; std::endl;
+    }
+}
+
+int main(int, char**) {
+    cv::VideoCapture cap;
   int camera;
-  cv::VideoCapture cap;
-  std::vector&lt;cv::Mat&gt; planes;
-  cv::Mat hist; //para o histograma, não vou ter mais as cores
-  int nbins = 64;
-  float range[] = {0, 255};
-  const float *histrange = { range };
-  bool uniform = true;
-  bool acummulate = false;
-  int key;
+  const int size = 21;    //vou usar uma matriz tipo 21x21 para representar os filtros
+  float media[size][size];
+  // Preenchendo a matriz com o valor 1/441
+    float valor = 1.0f / (size * size);
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            media[i][j] = valor;
+        }
+    }
 
-  //camera = cameraEnumerator();
-  //cap.open(camera);
-  cap.open("/dev/video0");  //para abrir a câmera no meu caso com a ajuda do DroidCam
+  //Para gauss, vou precisar do desvio-padrão dado por sigma
+  const float sigma = 1.0f;
+  float gauss[size][size];
+  float sum = 0.0f;
 
-  if(!cap.isOpened()){
-    std::cout &lt;&lt; "cameras indisponiveis";
+  // Calculando os valores com base na fórmula de Gauss
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            // Coordenadas relativas ao centro da matriz
+            int x = i - size / 2;
+            int y = j - size / 2;
+
+            // Calculando o valor usando a fórmula de Gauss 2D
+            gauss[i][j] = (1.0f / (2.0f * M_PI * sigma * sigma)) *
+                          exp(-(x * x + y * y) / (2.0f * sigma * sigma));
+            sum += gauss[i][j];  // Acumulando para normalização
+        }
+    }
+
+    // Normalizando a matriz para que a soma seja 1
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            gauss[i][j] /= sum;  // Dividindo cada valor pela soma
+        }
+    }
+
+float horizontal[21][21] = {0};
+// Preencher o filtro Sobel horizontal
+    int center = 21 / 2; // Centro da matriz (linha do meio)
+
+    // Preencher as colunas à esquerda (valores negativos)
+    for (int i = 0; i &lt; center; ++i) {
+        horizontal[i][center] = -(i + 1);  // Valores negativos (de -1 a -10)
+    }
+
+    // Preencher as colunas à direita (valores positivos)
+    for (int i = center + 1; i &lt; 21; ++i) {
+        horizontal[i][center] = (i - center);  // Valores positivos (de +1 a +10)
+    }
+
+    // Preencher a coluna do meio com 0 (já inicializada como 0)
+    for (int i = 0; i &lt; 21; ++i) {
+        horizontal[i][center] = 0;
+    }
+
+
+float vertical[21][21] = {0};
+// Preencher a matriz vertical
+    for (int i = 0; i &lt; 21; ++i) {
+        for (int j = 0; j &lt; 21; ++j) {
+            // Valor para a matriz vertical
+            int value = i - j;  // Definindo a diferença entre i e j
+            vertical[i][j] = value;
+        }
+    }
+
+
+
+float laplacian[21][21] = {0};  //iniciando a matriz com zero
+laplacian[center][center] = 20; //defino meu valor central como 20
+
+// Preencher as bordas com -1
+    for (int i = 0; i &lt; 21; ++i) {
+        for (int j = 0; j &lt; 21; ++j) {
+            // Preencho as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                laplacian[i][j] = -1;
+            }
+        }
+    }
+
+float boost[21][21] = {0};  //vou inicializá-lo com zero
+boost[center][center] = 5.2;    //valor central será 5.2
+
+
+    // Preencher as bordas com -1
+    for (int i = 0; i &lt; size; ++i) {
+        for (int j = 0; j &lt; size; ++j) {
+            // Preencher as bordas com -1, exceto o centro
+            if (i != center || j != center) {
+                boost[i][j] = -1;
+            }
+        }
+    }
+
+
+  //Na mask, faço o procedimento padrão para construir a matriz a ser usada como máscara
+  cv::Mat frame, framegray, frame32f, frameFiltered;
+  cv::Mat mask(21, 21, CV_32F);
+  cv::Mat result;
+  double width, height;
+  int absolut;
+  char key;
+
+  camera = cameraEnumerator();
+  cap.open(camera);
+  //cap.open("/dev/video0");  // abre a câmera
+
+  if (!cap.isOpened()) {
+    std::cout &lt;&lt; "Câmera indisponível!" &lt;&lt; std::endl;
     return -1;
   }
 
   cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-  width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-  height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-  std::cout &lt;&lt; "largura = " &lt;&lt; width &lt;&lt; std::endl;
-  std::cout &lt;&lt; "altura  = " &lt;&lt; height &lt;&lt; std::endl;
+  cv::namedWindow("filtroespacial", cv::WINDOW_NORMAL);
+  cv::namedWindow("original", cv::WINDOW_NORMAL);
 
-  int histw = nbins, histh = nbins/2;
-  histogramImage = cv::Mat(histh, histw, CV_8UC3, cv::Scalar(0,0,0));
+  mask = cv::Mat(21, 21, CV_32F, media);
+  //mask recebe matrix 21x21 em ponto flutuante c/ valores iniciais = media
 
-  while(1){
-    cap &gt;&gt; image;
-    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY); //conversão agora para os tons de cinza
-    cv::equalizeHist(grayImage, equalizedImage);        //equalização do histograma aplicado
+  absolut = 1;  // calcula absoluto da imagem
 
-    //Em seguida, vou fazer o cálculo do histograma
-    cv::calcHist(&amp;equalizedImage, 1, 0, cv::Mat(), hist, 1,
-                 &amp;nbins, &amp;histrange, uniform, acummulate);
-
-    cv::normalize(hist, hist, 0, histogramImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-    histogramImage.setTo(cv::Scalar(0));
-
-
-    //Aqui é feito o desenho do gráfico dos histogramas
-    for(int i=0; i&lt;nbins; i++){
-      cv::line(histogramImage,
-               cv::Point(i, histh),
-               cv::Point(i, histh-cvRound(hist.at&lt;float&gt;(i))),
-               cv::Scalar(0, 0, 255), 1, 8, 0);
+  for (;;) {
+    cap &gt;&gt; frame;  // captura nova imagem da camera
+    //capturo as imagens coloridas de forma constante na matriz cap e converto em tons de cinza abaixo
+    cv::cvtColor(frame, framegray, cv::COLOR_BGR2GRAY);
+    cv::flip(framegray, framegray, 1); //flip inverte a imagem horizontalmente
+    cv::imshow("original", framegray);
+    framegray.convertTo(frame32f, CV_32F);
+    cv::filter2D(frame32f, frameFiltered, frame32f.depth(), mask, cv::Point(1, 1), cv::BORDER_REPLICATE);
+    if (absolut) {
+      frameFiltered = cv::abs(frameFiltered);
     }
 
-    cv::cvtColor(equalizedImage, equalizedImage, cv::COLOR_GRAY2BGR);
-    histogramImage.copyTo(equalizedImage(cv::Rect(0, 0, nbins, histh)));
-    cv::imshow("imagem equalizada", equalizedImage);
-    key = cv::waitKey(30);
-    if(key == 27) break;
+    frameFiltered.convertTo(result, CV_8U);
+
+    cv::imshow("filtroespacial", result);
+
+    key = (char)cv::waitKey(10);
+    if (key == 27) break;  // tecla ESC pressionada!
+    switch (key) {
+      case 'a':
+        absolut = !absolut;
+        break;
+      case 'm':
+        mask = cv::Mat(21, 21, CV_32F, media);
+        printmask(mask);
+        break;
+      case 'g':
+        mask = cv::Mat(21, 21, CV_32F, gauss);
+        printmask(mask);
+        break;
+      case 'h':
+        mask = cv::Mat(21, 21, CV_32F, horizontal);
+        printmask(mask);
+        break;
+      case 'v':
+        mask = cv::Mat(21, 21, CV_32F, vertical);
+        printmask(mask);
+        break;
+      case 'l':
+        mask = cv::Mat(21, 21, CV_32F, laplacian);
+        printmask(mask);
+        break;
+      case 'b':
+        mask = cv::Mat(21, 21, CV_32F, boost);
+        break;
+      default:
+        break;
+    }
   }
   return 0;
-}</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O código usado para obter o vídeo em tons de cinza sem efeito:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>#include &lt;iostream&gt;
-#include &lt;opencv2/opencv.hpp&gt;
-
-int main(int argc, char** argv){
-    cv::Mat image, grayImage, hist;
-    int width, height;
-    cv::VideoCapture cap;
-    int nbins = 64; // número de faixas para o histograma (tons de cinza)
-    float range[] = {0, 255};  // faixa de valores possíveis (tons de cinza)
-    const float* histrange = { range };
-    bool uniform = true;
-    bool accumulate = false;
-    int key;
-
-    cap.open("/dev/video0");  // abre a câmera
-    if(!cap.isOpened()){
-        std::cout &lt;&lt; "Câmera indisponível!" &lt;&lt; std::endl;
-        return -1;
-    }
-
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-    height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-
-    std::cout &lt;&lt; "Largura = " &lt;&lt; width &lt;&lt; std::endl;
-    std::cout &lt;&lt; "Altura = " &lt;&lt; height &lt;&lt; std::endl;
-
-    int histw = nbins, histh = nbins / 2;
-    cv::Mat histImg(histh, histw, CV_8UC3, cv::Scalar(0,0,0));
-
-    while(1){
-        cap &gt;&gt; image;
-        if (image.empty()) {
-            std::cout &lt;&lt; "Falha ao capturar a imagem!" &lt;&lt; std::endl;
-            break;
-        }
-
-        // Converte a imagem para tons de cinza
-        cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
-
-        // Calcula o histograma da imagem em tons de cinza
-        cv::calcHist(&amp;grayImage, 1, 0, cv::Mat(), hist, 1, &amp;nbins, &amp;histrange, uniform, accumulate);
-
-        // Normaliza o histograma
-        cv::normalize(hist, hist, 0, histImg.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-        histImg.setTo(cv::Scalar(0));
-
-        // Desenha o gráfico do histograma
-        for(int i = 0; i &lt; nbins; i++) {
-            cv::line(histImg,
-                     cv::Point(i, histh),
-                     cv::Point(i, histh - cvRound(hist.at&lt;float&gt;(i))),
-                     cv::Scalar(0, 0, 255), 1, 8, 0);
-        }
-
-        // A imagem em tons de cinza é copiada no canto da imagem original
-        cv::cvtColor(grayImage, image, cv::COLOR_GRAY2BGR);  // Converte de volta para colorido para visualização
-        histImg.copyTo(image(cv::Rect(0, 0, nbins, histh)));
-
-        // Exibe a imagem com o histograma
-        cv::imshow("Imagem em Tons de Cinza com Histograma", image);
-
-        key = cv::waitKey(30);
-        if(key == 27) break; // Sai ao pressionar ESC
-    }
-    return 0;
 }</pre>
 </div>
 </div>
@@ -803,7 +865,7 @@ int main(int argc, char** argv){
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-08 13:53:06 -0300
+Last updated 2024-11-08 13:46:56 -0300
 </div>
 </div>
 </body>
