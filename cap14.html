@@ -599,54 +599,32 @@ boost[center][center] = 5.2;    //valor central será 5.2
 <div class="paragraph">
 <p>Após fazer o for responsável pela captura de imagens na câmera, de fazer as conversões para tons de cinza e para os comandos de aplicação com os filtros, diferentes resultados foram obtidos. Fazendo primeiramente para o caso 11x11, os efeitos obtidos pela captura da câmera serão mostrados abaixo:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::media11x11.png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::gaussiana11x11.png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::laplaciano_absolutro11x11.png[]</p></td>
-</tr>
-</tbody>
-</table>
+<div style="display: flex; justify-content: space-between;">
+  <img src="media11x11.png" alt="Filtro média 11x11" style="width: 30%;"/>
+  <img src="gaussiana11x11.png" alt="Filtro gaussiana 11x11" style="width: 30%;"/>
+  <img src="laplaciano_absolutro11x11.png" alt="Laplaciano (absolut) 11x11" style="width: 30%;"/>
+</div>
 <div class="paragraph">
 <p>Abaixo os filtors de Sobel, horizontal e vertical:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_horizontal_absoluto11x11.png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::sobel_vertical11x11.png[]</p></td>
-</tr>
-</tbody>
-</table>
+<div style="display: flex; justify-content: space-between;">
+  <img src="sobel_horizontal_absoluto11x11.png" alt="Sobel horizontal (absol) 11x11" style="width: 30%;"/>
+  <img src="sobel_vertical11x11.png" alt="Sobel vertical 11x11" style="width: 30%;"/>
+</div>
 <div class="paragraph">
 <p>O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::media_gaussiana3x3.png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::boost3x3.png[]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image::laplaciano_3x3.png[]</p></td>
-</tr>
-</tbody>
-</table>
+<div style="display: flex; justify-content: space-between;">
+  <img src="media_gaussiana3x3.png" alt="Media/gaussiana 3x3" style="width: 30%;"/>
+  <img src="boost3x3.png" alt="Boost 3x3" style="width: 30%;"/>
+  <img src="laplaciano_3x3.png" alt="Laplaciano 3x3" styke="width: 30%;"/>
+</div>
 <div class="paragraph">
 <p>Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à medida que foram aumentando as matrizes, o borrão no filtro média aumentava, com o filtro gaussiano corringindo esse defeito. O efeito boost também é aplicado (que é a imagem do centro), que perde seu efeito no decorrer do aumento das matrizes. Os efeitos vistos nas matrizes de Sobel encontram-se abaixo:</p>
+</div>
+<div style="display: flex; justify-content: space-between;">
+  <img src="sobel_verticala3x3.png" alt="Sobel vertical 3x3" style="width: 30%;"/>
+  <img src="sobel_horizontal3x3.png" alt="Sobel horizontal 3x3" style="width: 30%;"/>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -865,7 +843,7 @@ boost[center][center] = 5.2;    //valor central será 5.2
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-08 13:46:56 -0300
+Last updated 2024-11-08 14:06:17 -0300
 </div>
 </div>
 </body>

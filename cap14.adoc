@@ -172,20 +172,24 @@ Abaixo os filtors de Sobel, horizontal e vertical:
 
 O que foi notado à medida em que a quantidade de matrizes foi aumentada foi a dificuldade das matrizes em atuar na captura de imagens, de forma que no momento em que a matriz foi aumentada para 21x21 praticamente a captura não se tornava perceptível, com execção da aplicação vertical do filtro de Sobel e dos filtros média e gaussiana, que mantiveram seus efeitos da aplicação anterior. Ao aumentar a quantidade de matrizes, foi percebida que a maioria dos filtros tinham dificuldades em fazer a captura, de forma que a qualidade se perdia. Ao aplicar as matrizes originalmente no tamanho 3x3, o resultado original foi obtido abaixo:
 
-[cols="1,1,1"]
-|===
-|image::media_gaussiana3x3.png[]
-|image::boost3x3.png[]
-|image::laplaciano_3x3.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="media_gaussiana3x3.png" alt="Media/gaussiana 3x3" style="width: 30%;"/>
+  <img src="boost3x3.png" alt="Boost 3x3" style="width: 30%;"/>
+  <img src="laplaciano_3x3.png" alt="Laplaciano 3x3" styke="width: 30%;"/>
+</div>
+++++
 
 Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à medida que foram aumentando as matrizes, o borrão no filtro média aumentava, com o filtro gaussiano corringindo esse defeito. O efeito boost também é aplicado (que é a imagem do centro), que perde seu efeito no decorrer do aumento das matrizes. Os efeitos vistos nas matrizes de Sobel encontram-se abaixo:
 
-[cols="1,1"]
-|===
-|image::sobel_verticala3x3.png[]
-|image::sobel_horizontal3x3.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="sobel_verticala3x3.png" alt="Sobel vertical 3x3" style="width: 30%;"/>
+  <img src="sobel_horizontal3x3.png" alt="Sobel horizontal 3x3" style="width: 30%;"/>
+</div>
+++++
 
 O código completo encontra-se abaixo:
 
