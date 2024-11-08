@@ -186,7 +186,7 @@ Na 3x3, os filtros média e gaussiano obtiveram o mesmo resultado, enquanto à m
 [role="image-row"]
 ++++
 <div style="display: flex; justify-content: space-between;">
-  <img src="sobel_verticala3x3.png" alt="Sobel vertical 3x3" style="width: 30%;"/>
+  <img src="sobel_vertical_a3x3.png" alt="Sobel vertical 3x3" style="width: 30%;"/>
   <img src="sobel_horizontal3x3.png" alt="Sobel horizontal 3x3" style="width: 30%;"/>
 </div>
 ++++
