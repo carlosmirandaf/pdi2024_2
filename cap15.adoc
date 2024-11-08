@@ -255,7 +255,7 @@ Após essa etapa, um laço for é utilizado para salvar os quadros e aplicar o e
 
 O vídeo com os efeitos aplicados encontra-se abaixo:
 
-media::output_tilt_shift.avi[]
+link:https://github.com/carlosmirandaf/pdi2024_2/blob/main/output_tilt_shift.avi[efeito tilt-shif]
 
 O código completo:
 
