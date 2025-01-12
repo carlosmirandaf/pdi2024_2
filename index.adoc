@@ -13,3 +13,8 @@ Digital de Imagens.
 * link:cap12.html[Cap 12 - Manipulação de histograma]
 * link:cap14.html[Cap 14 - Filtragem no domínio espacial 1 - Convolução]
 * link:cap15.html[Cap 15 - Filtragem no domínio espacial 2 - Tiltshift]
+
+== Segunda Unidade
+
+* link:unidade2/cap16.html[Cap 16 - A Transformada Discreta de Fourier]
+
