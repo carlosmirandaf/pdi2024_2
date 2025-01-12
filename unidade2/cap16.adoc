@@ -3,7 +3,7 @@ Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
 
 == Cap 16 - A Transformada Discreta de Fourier
 
-Quando temos sinais, eles estão representados em função do tempo.contínuo Ao passarmos para o tempo discreto, esses sinais são amostrados e elencados em função da frequência, depois eles são representados como se fossem uma soma de vários senos com diferentes frequências e deslocamentos de fases do tempo. Essa representação é chamada de ``**Transformada de Fourier**``. No caso das imagens digitais, o processo se dá através da ``**Transformada Discreta de Fourier (TDF)**``.
+Quando temos sinais, eles estão representados em função do tempo.contínuo Ao passarmos para o tempo discreto, esses sinais são amostrados e elencados em função da frequência, depois eles são representados como se fossem uma soma de vários senos com diferentes frequências e deslocamentos de fases do tempo. Essa representação é chamada de ``**Transformada de Fourier**``. No caso das imagens digitais, o processo se dá através da **__Transformada Discreta de Fourier (TDF)__**.
 
 Ao submeter uma imagem à TDF, existem fontes de sinais que geram ruídos. Por definição, uma imagem possui um espectro para a magnitude e outro para a fase, sua imagem é preto ou branco devido ao caráter periódico da função seno. A imagem é composta de senóides horizontal e vertical e é filtrada de acordo com as partes geradas e calculadas na transformada e no espectro de magnitude.
 
