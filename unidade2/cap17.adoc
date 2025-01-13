@@ -11,7 +11,7 @@ A imagem utilizada para o teste encontra-se abaixo:
 
 image::cap17_imagem_original.png[]
 
-Uma característica da foto é que ela possui uma sobra que indica a posição na qual foi tirada do trecho do caderno. O filtro homomórfico pode ser aplicado tanto através do Gaussiano quanto do Butterworth. Em ambos, o filtro homomórfico atua através de parâmetros de ganhos de baixa e alta frequência que servem para atenuá-las (representadas pela letra grega _gama_ &#947). Para esta atividade, foi optado por usar um filtro tipo gaussiano para as aplicações de filtro homomórfico.
+Uma característica da foto é que ela possui uma sobra que indica a posição na qual foi tirada do trecho do caderno. O filtro homomórfico pode ser aplicado tanto através do Gaussiano quanto do Butterworth. Em ambos, o filtro homomórfico atua através de parâmetros de ganhos de baixa e alta frequência que servem para atenuá-las (representadas pela letra grega _gama_ &#947;). Para esta atividade, foi optado por usar um filtro tipo gaussiano para as aplicações de filtro homomórfico.
 
 Por utilizar TDF, o código reaproveita as trocas de quadrantes do capítulo anterior, só que agora uma função voltada para o filtro homomórfico será adicionada.
 
@@ -40,7 +40,7 @@ image::cap17_imagem_filtrada_gaussiana.png[]
 
 O filtro conseguiu atenuar a parte pouca iluminada provocada pela sombra da imagem original, no entanto ele não conseguiu passar todos os detalhes das partes escritas à lápis comum que corresponde aos gráficos dos sinais do trecho da imagem.
 
-Para os dados do caso gaussiano, os valores de &#947 (H e L, respectivamente) e do raio de corte encontra-se a seguir:
+Para os dados do caso gaussiano, os valores de &#947; (H e L, respectivamente) e do raio de corte encontra-se a seguir:
 
 [cpp]
 ----
