@@ -17,4 +17,5 @@ Digital de Imagens.
 == Segunda Unidade
 
 * link:unidade2/cap16.html[Cap 16 - A Transformada Discreta de Fourier]
+* link:unidade2/cap17.html[Cap 17 - Filtragem no Domínio da Frequência]
 
