@@ -442,66 +442,162 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_19_detector_de_bordas_com_algoritmo_de_canny">Cap 19 - Detector de Bordas com Algoritmo de Canny</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>Após a obtenção da imagem e da aplicação de um filtro (que no capítulo anterior foi feito via gaussiano) para suavizá-la, o que se tem depois são as transições daquilo que é claro e escuro, o que pode ser chamado de <strong>bordas</strong>. O algoritmo de Canny faz essa estapa calculando a magnitude e a direção do gradiente e os ângulos das imagens. Estes cálculos vão resultar na formação de cristas largas que vão ser afinadas via supressão de não-máximos na imagem e na magnitude do gradiente. Por fim, usa-se a dupla limiar e a análise de conectividade para detectar e conectar bordas.</p>
+</div>
+<div class="paragraph">
+<p>Este tipo de detecção favorece o uso de truques que o torna próximo de simular um efeito artístico, mais especificamente o pontilhismo, que é a técnica objeto de estudos deste capítulo e do exercício.</p>
+</div>
+<div class="sect2">
+<h3 id="_exercícios_19_2">Exercícios 19.2</h3>
+<div class="paragraph">
+<p>A imagem a ser objeto de aplicação encontra-se abaixo:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="cap19_cloud.jpg" alt="cap19 cloud">
 </div>
 </div>
+<div class="paragraph">
+<p>No código, primeiro é definido o número de passos entre os pontos chamados de <strong><em>STEP</em></strong>, o que foi notado é que quanto maior o número de passos, mais distantes eles ficarão uns dos outros. Depois foi definido um valor <strong><em>JITTER</em></strong> que será responsável pelo deslocamento de pontos aleatórios, quanto maior o valor, mais eles se deslocam. Depois foi definido o valor do <strong><em>RAIO</em></strong> para cada bolinha da imagem.</p>
 </div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Para aplicar o filtro de Canny, foram usadas variáveis para definir valores fixos do threshold para os pontos de borda:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    //Aplicando filtro de Canny com valores fixos para os pontos de borda
+    cv::Mat border;
+    int lower_threshold = 50;
+    int upper_threshold = 100;
+    cv::Canny(image, border, lower_threshold, upper_threshold);</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>O resultado para o caso <strong><em>STEP</em></strong> = 2, <strong><em>JITTER</em></strong> = 5 e <strong><em>RAIO</em></strong> = 4 foi:</p>
 </div>
-<div class="sect1">
-<h2 id="_segunda_unidade">Segunda Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade2/cap16.html">Cap 16 - A Transformada Discreta de Fourier</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap17.html">Cap 17 - Filtragem no Domínio da Frequência</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap19.html">Cap 19 - Detecção de Bordas com o Algoritmo de Canny</a></p>
-</li>
-</ul>
+<div class="imageblock">
+<div class="content">
+<img src="cap19_pontos_step_2_jitter_5_raio_4.jpg" alt="cap19 pontos step 2 jitter 5 raio 4">
+</div>
+</div>
+<div class="paragraph">
+<p>O efeito ficou bem próximo aos das técnicas pontilhistas mostrados pelo pintor Georges Seurat. Mais testes foram feitos, como no caso <strong><em>STEP</em></strong> = 2, <strong><em>JITTER</em></strong> = 2 e <strong><em>RAIO</em></strong> = 2. Considerando que aqui os valores de <strong><em>JITTER</em></strong> e <strong>_RAIO</strong> foram menores, o resultado mostrou-se mais próximo do caso da imagem, porém ainda carregando sutis sinais da técnica pontilhista que tornou o resultado igualmente interessante:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="cap19_pontos_step_2_jitter_2_raio_2.jpg" alt="cap19 pontos step 2 jitter 2 raio 2">
+</div>
+</div>
+<div class="paragraph">
+<p>Ainda foi aplicado um terceito teste para o caso <strong><em>STEP</em></strong> = 3, <strong><em>JITTER</em></strong> = 4 e <strong><em>RAIO</em></strong> = 2. Nesta situação, foi notado que os pontos ficaram mais distantes um do outro em razão do aumento do <strong><em>STEP</em></strong>, já que nos demais casos o valor foi mantido igual a 2. O resultado não ficou tão bom em comparação com os casos acima, mas ainda é interessante de se ver:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="cap19_pontos_step_3_jitter_4_raio_2.jpg" alt="cap19 pontos step 3 jitter 4 raio 2">
+</div>
+</div>
+<div class="paragraph">
+<p>O código completo encontra-se abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;algorithm&gt;
+#include &lt;cstdlib&gt;
+#include &lt;ctime&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;numeric&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;vector&gt;
+#include &lt;chrono&gt;
+#include &lt;random&gt;
+
+#define STEP 2  //quanto maior o número de passos, mais distantes ficarão os pontos, a depender dos debaixo
+#define JITTER 5 //o jitter é responsável pelo deslocamento entre os pontos aleatórios, quanto &gt;, mais eles se deslocam
+#define RAIO 4 //se eu aumentar os passos acima, quanto &lt; o raio, mais distantes os pontos estarão
+
+int top_slider = 50;
+int top_slider_max = 200;
+
+int main (int argc, char** argv) {
+    std::vector&lt;int&gt; yrange;    //fração da largura da imagem
+    std::vector&lt;int&gt; xrange;    //fração da altura da imagem
+
+    //acima só vou referenciar alguns pontos da imagem amostrada
+    cv::Mat image;
+
+    image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
+
+    int width = image.cols;
+    int height = image.rows;
+    int gray, x, y;
+
+    if(image.empty()) {
+        std::cout &lt;&lt; "Could not open the file or find the image" &lt;&lt; std::endl;
+        return -1;
+    }
+
+    //Aplicando filtro de Canny com valores fixos para os pontos de borda
+    cv::Mat border;
+    int lower_threshold = 50;
+    int upper_threshold = 100;
+    cv::Canny(image, border, lower_threshold, upper_threshold);
+
+    //Inicializando as variáveis e matrizes
+    cv::Mat points(height, width, CV_8U, cv::Scalar(255));
+
+    xrange.resize(height/STEP);
+    yrange.resize(width/STEP);
+
+    //No iota, vou gerar uma faixa de valores do início ao fim dos aleatórios
+    std::iota(xrange.begin(), xrange.end(), 0);
+    std::iota(yrange.begin(), yrange.end(), 0);
+
+    for (uint i = 0; i &lt; xrange.size(); i++) {
+        xrange[i] = xrange[i] * STEP + STEP / 2;
+     }
+
+    for (uint i = 0; i &lt; yrange.size(); i++) {
+        yrange[i] = yrange[i] * STEP + STEP / 2;
+    }
+
+    points = cv::Mat(height, width, CV_8U, cv::Scalar(255));
+
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(xrange.begin(), xrange.end(), std::default_random_engine(seed));
+
+    for (auto i : xrange) {
+    std::shuffle(yrange.begin(), yrange.end(), std::default_random_engine(seed));
+        for (auto j : yrange) {
+          x = i + std::rand() % (2 * JITTER) - JITTER + 1;
+          y = j + std::rand() % (2 * JITTER) - JITTER + 1; //JITTER trata dos deslocamentos aleatórios entre pixels
+
+
+          gray = image.at&lt;uchar&gt;(x, y);
+          int raio = RAIO * (255 - gray) / 255;   //Mais claro = menor ponto
+          raio = std::max(raio, 1);           //Garantir tamanho mínimo de 1
+          cv::circle(points, cv::Point(y, x), RAIO, CV_RGB(gray, gray, gray),
+          cv::FILLED, cv::LINE_AA);
+
+    }
+  }
+  cv::imshow("Pontilhismo usando Canny", points);
+  cv::imwrite("pontos.jpg", points);
+  return 0;
+}</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-13 20:46:16 -0300
+Last updated 2025-01-13 20:45:19 -0300
 </div>
 </div>
 </body>

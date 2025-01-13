@@ -18,4 +18,5 @@ Digital de Imagens.
 
 * link:unidade2/cap16.html[Cap 16 - A Transformada Discreta de Fourier]
 * link:unidade2/cap17.html[Cap 17 - Filtragem no Domínio da Frequência]
+* link:unidade2/cap19.html[Cap 19 - Detecção de Bordas com o Algoritmo de Canny]
 
