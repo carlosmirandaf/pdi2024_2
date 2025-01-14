@@ -442,69 +442,103 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_20_quantização_vetorial_com_k_means">Cap 20 - Quantização Vetorial com k-means</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>0 k-means é um algoritmo comumente usado em aplicações voltadas para inteligência artificial, no qual ele faz um agrupamento de dados (conhecido como <em>clustering</em>), extrai informações de sua base e agrupa de acordo com alguma métrica. Além disso, ele é utilizado para reduções de dimensionalidade, logo ele também é aplicado para compressão de dados.</p>
+</div>
+<div class="paragraph">
+<p>Dentro do processamento de imagens, para o seu algoritmo é oferecido valores em pontos flutuantes, então o dataset é dividido em <em>k</em> classes para achar os centros. Estes centros, ao serem encontrados, serão os melhores conjuntos de elementos do algoritmo e a distância da amostra para o centro define a qual classe ela pertence.</p>
+</div>
+<div class="paragraph">
+<p>Outra característica do k-means é o fato dele ser iterativo e simples. O usuário define quantas classes deseja e os seus centros, ao executá-lo define-se quantas vezes ele irá rodar ou as condições para a estabilização.</p>
+</div>
+<div class="sect2">
+<h3 id="_exercícios_20_3">Exercícios 20.3</h3>
+<div class="paragraph">
+<p>Para este exercício, o código k-means será rodado 10 vezes, porém a execução é feita mantendo o <strong><em>nRodadas</em></strong> = 1. A ideia é mostrar como o algoritmo atua no processamento de imagens e as diferenças de resultados captados. No começo do código, para explicitar que as diferenças ocorrem para cada rodada, foi introduzido uma linha nele que garanta isso, conforme mostrado a seguir:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    cv::theRNG().state = cv::getTickCount();</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>A linha acima altera a semente que gera números aleatórios para a imagem. O número de clusters utilizado aqui foi de 8.</p>
 </div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>O resultado dos diferentes resultados para cada rodada está expresso em forma de um gif, baseado na imagem que foi objeto de exemplo para o exercício do capítulo 19:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="cloud_10rodadas.gif" alt="cloud 10rodadas">
 </div>
 </div>
+<div class="paragraph">
+<p>O código completo encontra-se abaixo:</p>
 </div>
-<div class="sect1">
-<h2 id="_segunda_unidade">Segunda Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade2/cap16.html">Cap 16 - A Transformada Discreta de Fourier</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap17.html">Cap 17 - Filtragem no Domínio da Frequência</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap19.html">Cap 19 - Detecção de Bordas com o Algoritmo de Canny</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap20.html">Cap 20 - Quantização Vetorial com k-means</a></p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;cstdlib&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+int main (int argc, char** argv) {
+    int nClusters = 8, nRodadas = 1;
+
+    cv::Mat rotulos, centros;
+
+    if (argc != 3) {
+        std::cout &lt;&lt; "kmeans entrada.jpg saida.jpg\n";
+        exit(0);
+    }
+
+    // Altere a semente do gerador de números aleatórios para garantir resultados diferentes em cada execução
+    cv::theRNG().state = cv::getTickCount();
+
+    //O k-means primeiramente opera sobre a imagem reduzindo as suas cores presentes
+    cv::Mat img = cv::imread(argv[1], cv::IMREAD_COLOR);
+    cv::Mat samples(img.rows*img.cols, 3, CV_32F); //aqui vou ter 3 colunas, cada uma pra uma cor R, G e B
+
+    for (int y=0; y&lt;img.rows; y++) {
+        for (int x=0; x&lt;img.cols; x++) {
+            for (int z=0; z&lt;3; z++) {   //Faço a cópia dos componentes da imagem de entrada p/ a matriz de amostras
+                samples.at&lt;float&gt;(y+x*img.rows, z) = img.at&lt;cv::Vec3b&gt;(y, x)[z]; //Vou copiar pixel a pixel
+            }
+        }
+    }
+
+    /*nClusters informa a quantidade de aglomerados que se deseja obter,
+    rotulos é um objeto do tipo Mat preenchido com elementos do tipo int, onde cada elemento
+    identifica a classe à qual pertence a amostra na matriz samples*/
+
+    cv::kmeans(samples, nClusters, rotulos, cv::TermCriteria(cv::TermCriteria::EPS |
+        cv::TermCriteria::COUNT, 10000, 0.0001), nRodadas, cv::KMEANS_RANDOM_CENTERS, centros);
+        //O TermCriteria trata do criterio de parada: aqui é máx de até 10000 iterações ou tolerância de 0.0001
+
+    cv::Mat rotulada(img.size(), img.type());
+    for (int y=0; y&lt;img.rows; y++) {
+        for (int x=0; x&lt;img.cols; x++) {
+            int indice = rotulos.at&lt;int&gt;(y + x*img.rows, 0);
+            rotulada.at&lt;cv::Vec3b&gt;(y, x)[0] = (uchar)centros.at&lt;float&gt;(indice, 0);
+            rotulada.at&lt;cv::Vec3b&gt;(y, x)[1] = (uchar)centros.at&lt;float&gt;(indice, 1);
+            rotulada.at&lt;cv::Vec3b&gt;(y, x)[2] = (uchar)centros.at&lt;float&gt;(indice, 2);
+        }
+    }
+
+    cv::imshow("kmeans", rotulada);
+    cv::imwrite(argv[2], rotulada);
+    cv::waitKey();
+}</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-14 19:07:50 -0300
+Last updated 2025-01-14 19:06:59 -0300
 </div>
 </div>
 </body>
