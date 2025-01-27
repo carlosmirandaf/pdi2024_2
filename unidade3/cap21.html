@@ -442,81 +442,113 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_21_extração_de_contornos">Cap 21 - Extração de Contornos</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>A forma de um objeto pode ser identificada através de técnicas de extrações de contornos. Existem formas de representação e descrição que se encarregam disso, como os descritores de Fourier, porém o OpenCV se dispõe de bibliotecas e comandos que já fazem esse trabalho como o <code><strong><em>cv::findContours</em></strong></code>. Dentro deste comando, o usuário extrai o contorno das componentes conectadas através de <code><strong><em>cv::CHAIN_APPROX_NONE</em></strong></code> ou <code><strong><em>cv::CHAIN_APPROX_SIMPLE</em></strong></code>. Ambas serão aplicadas em diferentes questões neste capítulo e foi constadada que existe diferença naquilo que o código obtém de pontos que compõem uma figura.</p>
+</div>
+<div class="paragraph">
+<p>Além disso, um aspecto que o código faz é pegar as figuras e identificar seus contornos e deixar uma cor vermelha para marcá-las. Isto ocorre porque a imagem é convertida para um espaço de cores BGR.</p>
+</div>
+<div class="sect2">
+<h3 id="_exercícios_21_2">Exercícios 21.2</h3>
+<div class="paragraph">
+<p>A primeira parte do exercício trata da obtenção de pontos em uma imagem de dois retângulos que se encontram superpostos conforme mostrado abaixo:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="retangulos.png" alt="retangulos">
 </div>
 </div>
+<div class="paragraph">
+<p>O código para a aplicação dos exercícios encontra-se adiante:</p>
 </div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+int main(int argc, char** argv) {
+    cv::Mat image, gray;
+    std::ofstream file;
+
+    image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
+
+    if(!image.data) {
+        std::cout &lt;&lt; "Não abriu" &lt;&lt; argv[1] &lt;&lt; std::endl;
+        return 0;
+    }
+
+    cv::threshold(image, image, 1, 255, cv::THRESH_BINARY + cv::THRESH_OTSU);
+
+    std::vector&lt;std::vector&lt;cv::Point&gt; &gt; contours;
+    std::vector&lt;cv::Vec4i&gt; hierarchy;
+
+    cv::findContours(image, contours, hierarchy, cv::RETR_EXTERNAL,
+                    cv::CHAIN_APPROX_NONE);
+
+    cv::cvtColor(image, image, cv::COLOR_GRAY2BGR);
+
+    //Fazendo a contagem dos pontos gerados
+    int contagemPontos = 0;
+
+    file.open("contornos.svg");
+    if (!file.is_open()) {
+        std::cout &lt;&lt; "nao abriu contornos.svg" &lt;&lt; std::endl;
+    return 0;
+    }
+
+    file &lt;&lt; "&lt;svg height=\"" &lt;&lt; image.rows &lt;&lt; "\" width=\"" &lt;&lt; image.cols
+         &lt;&lt; "\" xmlns=\"http://www.w3.org/2000/svg\"&gt; " &lt;&lt; std::endl;
+
+    for(size_t i = 0; i &lt; contours.size(); i++) {
+        file &lt;&lt; "&lt;path d=\"M " &lt;&lt; contours[i][0].x &lt;&lt; " " &lt;&lt; contours[i][0].y
+         &lt;&lt; " ";
+    for (size_t j = 1; j &lt; contours[i].size(); j++) {
+        file &lt;&lt; "L" &lt;&lt; contours[i][j].x &lt;&lt; " " &lt;&lt; contours[i][j].y &lt;&lt; " ";
+        }
+        file &lt;&lt; "Z\" fill=\"#cccccc\" stroke=\"black\" stroke-width=\"1\" /&gt;"
+         &lt;&lt; std::endl;
+
+        contagemPontos += contours[i].size();
+        cv::drawContours(image, contours, i, CV_RGB(255, 0, 0));
+    }
+    file &lt;&lt; "/svg" &lt;&lt; std::endl;
+
+    //Exibindo a contagem
+    std::cout &lt;&lt; "Total de pontos= " &lt;&lt; contagemPontos &lt;&lt; std::endl;
+
+    cv::imshow("imagem", image);
+    cv::waitKey();
+    return 0;
+}</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Inicialmente a obtenção de pontos foi feito considerando o trecho <code><strong><em>cv::CHAIN_APPROX_NONE</em></strong></code>. O resultado mostra uma obtenção de pontos muito maior do que aquilo que os nossos olhos poderiam imaginar, isto ocorre porque ele guarda todos os pontos conectados da figura. A consequência é que muitos pontos acabam se tornando redundantes e podem ocupar um volume demasiado grande na representação da figura, especialmente se ela for uma figura simples. Aqui o total de pontos acumulados foi igual a 746, conforme mostrado na execução abaixo:</p>
 </div>
-<div class="sect1">
-<h2 id="_segunda_unidade">Segunda Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade2/cap16.html">Cap 16 - A Transformada Discreta de Fourier</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap17.html">Cap 17 - Filtragem no Domínio da Frequência</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap19.html">Cap 19 - Detecção de Bordas com o Algoritmo de Canny</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap20.html">Cap 20 - Quantização Vetorial com k-means</a></p>
-</li>
-</ul>
+<div class="imageblock">
+<div class="content">
+<img src="cap21_total_pontos.png" alt="cap21 total pontos">
 </div>
 </div>
+<div class="paragraph">
+<p>Na etapa seguinte foi proposta uma pequena modificação no código acima, substituindo <code><strong><em>cv::CHAIN_APPROX_NONE</em></strong></code> por <code><strong><em>cv::CHAIN_APPROX_SIMPLE</em></strong></code>. O resultado foi um valor de pontos capturados consideravelmente menor, de 746 pontos para 10 pontos. Muito embora nossos olhos observem 8 pontos por causa dos contornos dos retângulos, os 2 pontos restantes poderiam ser explicados pelo fato do código obter pontos que não estão visíveis ao olho humano, podendo ser subentendido que ele também pegue os contornos dos dois retângulos que por conta da cor branca das figuras sobrepostas não é possível ser visto. Em resumo, o novo comando elimina qualquer tipo de redundância no acúmulo de pontos. O resultado da execução encontra-se a seguir:</p>
 </div>
-<div class="sect1">
-<h2 id="_terceira_unidade">Terceira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade3/cap21.html">Cap 21 - Extração de Contornos</a></p>
-</li>
-</ul>
+<div class="imageblock">
+<div class="content">
+<img src="cap21_2_2_novo_total_pontos.png" alt="cap21 2 2 novo total pontos">
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-27 10:52:48 -0300
+Last updated 2025-01-27 10:52:31 -0300
 </div>
 </div>
 </body>
