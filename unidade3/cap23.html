@@ -5,8 +5,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
-<meta name="author" content="Carlos Antonio Miranda Filho &lt;carlosantonio_miranda@hotmail.com&gt;">
-<title>Processamento Digital de Imagens (2024.2)</title>
+<meta name="author" content="Carlos Antonio Miranda Filho (carlosantonio_miranda@hotmail.com)">
+<title>Processasmento Digital de Imagens (2024.2)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -436,90 +436,373 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>Processamento Digital de Imagens (2024.2)</h1>
+<h1>Processasmento Digital de Imagens (2024.2)</h1>
 <div class="details">
-<span id="author" class="author">Carlos Antonio Miranda Filho &lt;carlosantonio_miranda@hotmail.com&gt;</span><br>
+<span id="author" class="author">Carlos Antonio Miranda Filho (carlosantonio_miranda@hotmail.com)</span><br>
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_23_extração_de_características_momentos_de_hu_para_contornos">Cap 23 - Extração de Características - Momentos de Hu para Contornos</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>Os momentos de Hu são técnicas de representação e descrição que servem para extrair características de uma determinada figura. Neste capítulo, estamos interessados na extração de contornos de componentes conectadas. Para este capítulo, a imagem com as formas encontra-se adiante:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="formas.png" alt="formas">
 </div>
 </div>
+<div class="paragraph">
+<p>Trata-se de uma imagem de parafusos, arruelas e buchas, cada uma de diferentes formas, o que é interessante na extração dos contornos. O resultado da aplicação do momento Hu foi:</p>
 </div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
+<div class="imageblock">
+<div class="content">
+<img src="contornos-rotulados.png" alt="contornos rotulados">
 </div>
 </div>
+<div class="paragraph">
+<p>Cada uma das peças recebe uma numeração que irá servir de rótulo para as peças. Depois foi feito uma tabela que mostram os valores que as representam geograficamente:</p>
 </div>
-<div class="sect1">
-<h2 id="_segunda_unidade">Segunda Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade2/cap16.html">Cap 16 - A Transformada Discreta de Fourier</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap17.html">Cap 17 - Filtragem no Domínio da Frequência</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap19.html">Cap 19 - Detecção de Bordas com o Algoritmo de Canny</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap20.html">Cap 20 - Quantização Vetorial com k-means</a></p>
-</li>
-</ul>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 2.7777%;">
+<col style="width: 5.5555%;">
+<col style="width: 8.3333%;">
+<col style="width: 11.1111%;">
+<col style="width: 13.8888%;">
+<col style="width: 16.6666%;">
+<col style="width: 19.4444%;">
+<col style="width: 22.2226%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798046</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.00282</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.66349</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.1468</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-22.5546</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14.9779</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-23.5111</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798076</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.19683</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.91077</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.4442</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-20.9916</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-14.3809</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-20.6653</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.0869539</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.157887</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.49555</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.6833</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.27273</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.60454</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-5.49111</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.120131</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.228636</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.25615</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.35104</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.65464</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.23696</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.88526</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.373823</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.820174</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.12233</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.44221</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.73046</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.89129</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.50767</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.371474</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.82325</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.12096</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.355</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.59299</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.76676</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-8.87464</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.129544</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.243706</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.00717</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.13737</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.20964</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.01563</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.50646</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.86567</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.60833</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.6456</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-21.5786</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-15.5273</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-21.3335</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.334708</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.736686</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.78304</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.96471</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.83859</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.33305</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.44577</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.106722</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.196061</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.05617</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.19955</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.32742</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.10162</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-4.48549</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.0958813</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.172621</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.989909</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.13171</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.19255</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.04588</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.11805</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.032083</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.0450323</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.34178</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.48339</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.89599</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.46109</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-5.03442</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">17</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798052</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.09326</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.97304</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13.5646</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-24.3674</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-16.275</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24.753</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.107708</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.200982</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.37277</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.5268</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.9766</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.4266</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-4.96253</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798084</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.30554</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.73545</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.1048</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.1286</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13.9228</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-20.2353</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.340446</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.748341</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.87315</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.05754</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.02289</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.43174</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-9.06747</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">21</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.11084</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.204674</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.06291</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.20705</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.34204</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.10472</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.49108</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.0581881</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.095187</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.47008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.70388</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.29087</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.65632</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-5.51248</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">25</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.798063</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.11058</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.00379</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.475</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-23.804</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.8112</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-22.7158</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.369687</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.816975</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.27876</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.50028</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.89012</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.91147</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-8.30278</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">27</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0.00117395</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.019307</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.50242</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.67226</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.2596</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.68191</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.34849</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.362363</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.792965</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.99692</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.2232</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.3335</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.62146</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.8081</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.338675</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.738061</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.85143</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.03897</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.98444</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.4133</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-9.42881</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_exercícios_23_2">Exercícios 23.2</h3>
+<div class="paragraph">
+<p>Neste exercício foi feita a extração dos momentos de Hu. O código do exercício:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+int main(int argc, char** argv) {
+    cv::Mat image;
+    std::ofstream file;
+    cv::Moments momentos;
+
+    // Verifica se o arquivo de entrada foi passado como argumento
+    if (argc &lt; 2) {
+        std::cout &lt;&lt; "Uso: " &lt;&lt; argv[0] &lt;&lt; "formas.png" &lt;&lt; std::endl;
+        return 1;
+    }
+
+    // Carrega a imagem em escala de cinza
+    image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
+
+    if (!image.data) {
+        std::cout &lt;&lt; "Erro ao abrir " &lt;&lt; argv[1] &lt;&lt; std::endl;
+        return 1;
+    }
+
+    // Abre o arquivo para salvar os momentos
+    file.open("momentos.txt");
+    if (!file.is_open()) {
+        std::cout &lt;&lt; "Erro ao abrir o arquivo momentos.txt" &lt;&lt; std::endl;
+        return 1;
+    }
+
+    // Aplica limiarização automática (Otsu) e inverte os pixels
+    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY + cv::THRESH_OTSU + cv::THRESH_BINARY_INV);
+
+    // Extrai os contornos
+    std::vector&lt;std::vector&lt;cv::Point&gt;&gt; contours;
+    std::vector&lt;cv::Vec4i&gt; hierarchy;
+    cv::findContours(image, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+
+    // Variável para contar o número de formas
+    int nformas = 0;
+
+    for (size_t i = 0; i &lt; contours.size(); i++) {
+        // Ignora contornos muito pequenos
+        if (contours[i].size() &lt; 10) {
+            continue;
+        }
+
+        nformas++;
+        momentos = cv::moments(contours[i]);
+
+        // Calcula os momentos de Hu
+        double hu[7];
+        cv::HuMoments(momentos, hu);
+
+        // Normaliza os momentos de Hu para o formato solicitado
+        file &lt;&lt; nformas &lt;&lt; ", ";
+        for (int j = 0; j &lt; 7; j++) {
+            hu[j] = -1 * copysign(1.0, hu[j]) * log10(abs(hu[j])); // Normalização
+            file &lt;&lt; hu[j];
+            if (j &lt; 6) file &lt;&lt; ", "; // Adiciona vírgula entre os valores
+        }
+        file &lt;&lt; std::endl;
+    }
+
+    // Fecha o arquivo e exibe o número de objetos encontrados
+    file.close();
+    std::cout &lt;&lt; "Numero de objetos: " &lt;&lt; nformas &lt;&lt; std::endl;
+
+    return 0;
+}</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Foi mostrado que existem 23 presentes na imagem.</p>
 </div>
-<div class="sect1">
-<h2 id="_terceira_unidade">Terceira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade3/cap21.html">Cap 21 - Extração de Contornos</a></p>
-</li>
-<li>
-<p><a href="unidade3/cap23.html">Cap 23 - Extração de Características - Momentos de Hu para Contornos</a></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Fazendo um comparativo, as peças 3, 5, 12, 17, 19 e 25 representam as arruelas, no qual foi observado que as primeiras 4 colunas estão positivas e com as últimas sendo negativas (com algumas exceções), podendo elas estarem associadas à um sentido que esteja contrário àquele que o código detecta dos contornos.</p>
+</div>
+<div class="paragraph">
+<p>As peças 7, 8, 11, 14, 15, 16, 21, 24, 27 e 29 são os parafusos, enquanto 9, 10, 13, 20, 26, 28 e 29 são as buchas. Da mesma forma que foi constatado nas arruelas, o sentido das peças conforme estão na imagem influenciam na extração de valores, o que nos dá alguns valores negativos nas últimas colunas, enquanto as primeiras permanecem positivas. Nos parafusos, na maioria dos casos foi observado que os valores negativos se concentram nas primeiras colunas, então neste caso o seu formato influenciou na obtenção de valores na tabela.</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-27 12:44:23 -0300
+Last updated 2025-01-27 12:44:32 -0300
 </div>
 </div>
 </body>
