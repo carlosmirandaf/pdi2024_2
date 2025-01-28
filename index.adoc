@@ -25,4 +25,5 @@ Digital de Imagens.
 
 * link:unidade3/cap21.html[Cap 21 - Extração de Contornos]
 * link:unidade3/cap23.html[Cap 23 - Extração de Características - Momentos de Hu para Contornos]
+* link:unidade3/cap24.html[Cap 24 - Filtragem de Forma com Morfologia Matemática]
 

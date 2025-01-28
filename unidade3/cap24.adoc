@@ -1,0 +1,86 @@
+= Processamento Digital de Imagens (2024.2)
+Carlos Antonio Miranda Filho <carlosantonio_miranda@hotmail.com>
+
+== Cap 24 - Filtragem de Forma com Morfologia Matemática
+
+Existem ruídos que representam a modificação da forma do objeto. Ao fazer a aquisição de uma cena, a imagem poderá vir com irregularidades. O que se pode fazer para corrigi-las é modificar a forma dos contornos de um objeto através da *_morfologia matemática_*. Esta técnica depende de um _elemento estruturante_, que por sua vez é uma matriz usada para interpretar uma imagem. Ela possui uma origem que é o seu centro e utilizam técnicas de translação e coordenadas inteiras para representar graficamente as alterações na imagem.
+
+Os elementos estruturantes usam as operações *erosão* (corrói os contornos), *dilatação* (expansão dos contornos), *abertura* (erosão seguida de dilatação) e *fechamento* (dilatação seguida de erosão) para fazer a correção. Após a aplicação delas, a imagem pode ser filtrada para a correção de ruídos.
+
+=== Exercícios 24.2
+
+A aplicação das operações de morfologia matemática será em imagens de números de diferentes displays de 7 segmentos. A proposta é convertê-los em uma exibição de número convencional (ou que se aproxime disso). Os números objetos de estudos serão:
+
+[cols="1,1,1,1,1"]
+|===
+|image::digitos-1.png[]
+|image::digitos-2.png[]
+|image::digitos-3.png[]
+|image::digitos-4.png[]
+|image::digitos-5.png[]
+|===
+
+Para o código, foi feito diferentes testes para as imagens com as diferentes operações explicadas anteriormente. Para a exibição dos resultados, contudo, foram priorizados os casos mais eficazes de transformação, conforme mostrados a seguir:
+
+[cols="1,1,1,1,1"]
+|===
+|image::novos-digitos-1.png[]
+|image::novos-digitos-2.png[]
+|image::novos-digitos-3.png[]
+|image::novos-digitos-4.png[]
+|image::novos-digitos-5.png[]
+|===
+
+Para cada dígito testado, os resultados à esquerda se referem à aplicação apenas da operação de erosão morfológica enquanto o da direita é o resultado da abertura. O elemento estruturante utilizado no código foi uma matriz do tipo 3x12, no qual foi utilizado esse valor porque ao deixar no formato 3x3, os números continuavam sendo exibidos de forma separada.
+
+Com a matriz 3x12, ao aplicar a erosão, foi notado que os pontos do display se ligaram e com isso sua exibição estava próxima daquilo que vemos como número, juntando assim os trechos separados. No entanto, sua exibição também se nota (possivelmente por influência do elemento estruturante) uma aparência mais "grossa" ou próxima de uma fonte negrito. Ao aplicar uma operação de abertura, essa aparência se tornou mais suavizada, isto se deve porque ele é uma operação de suavização de contornos e de eliminação de saliências finas.
+
+O código utilizado para a questão encontra-se adiante:
+
+[cpp]
+----
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+int main(int argc, char** argv) {
+    cv::Mat image, erosao, dilatacao, abertura, fechamento, abertfecha;
+    cv::Mat str;
+
+    if (argc != 2) {
+        std::cout << "morfologia entrada saida\n";
+    }
+
+    image = cv::imread(argv[1], cv::IMREAD_UNCHANGED);
+
+    //  image = cv::imread(argv[1], -1);
+
+    if(image.empty()) {
+        std::cout << "Erro ao abrir imagem\n" << argv[1] << std::endl;
+        return -1;
+    }
+
+    // elemento estruturante
+    // vou criar um elemento estruturante 3x12 c/ todos os valores preenchidos com 1
+    // este 1 indica que ele irá atuar sobre todos os morfologia da vizinhança
+    str = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,12));
+    // erosao
+    cv::erode(image, erosao, str);
+    // dilatacao
+    cv::dilate(image, dilatacao, str);
+    // abertura (erosao seguida de dilatacao)
+    cv::morphologyEx(image, abertura, cv::MORPH_OPEN, str); //morphologyEx permite fazer as operacoes
+    // fechamento (dilatacao seguida de erosao)
+    cv::morphologyEx(image, fechamento, cv::MORPH_CLOSE, str);
+    // abertura -> fechamento
+    cv::morphologyEx(abertura, abertfecha, cv::MORPH_CLOSE, str);
+
+    cv::Mat matArray[] = {erosao, dilatacao, abertura, fechamento, abertfecha};
+    cv::hconcat(matArray, 5, image);
+
+    cv::imshow("morfologia", image);
+
+    cv::waitKey();
+    return 0;
+}
+----
+

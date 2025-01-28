@@ -442,87 +442,122 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_cap_24_filtragem_de_forma_com_morfologia_matemática">Cap 24 - Filtragem de Forma com Morfologia Matemática</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Página voltada para relatar as aplicações dos algoritmos da matéria Processamento
-Digital de Imagens.</p>
+<p>Existem ruídos que representam a modificação da forma do objeto. Ao fazer a aquisição de uma cena, a imagem poderá vir com irregularidades. O que se pode fazer para corrigi-las é modificar a forma dos contornos de um objeto através da <strong><em>morfologia matemática</em></strong>. Esta técnica depende de um <em>elemento estruturante</em>, que por sua vez é uma matriz usada para interpretar uma imagem. Ela possui uma origem que é o seu centro e utilizam técnicas de translação e coordenadas inteiras para representar graficamente as alterações na imagem.</p>
+</div>
+<div class="paragraph">
+<p>Os elementos estruturantes usam as operações <strong>erosão</strong> (corrói os contornos), <strong>dilatação</strong> (expansão dos contornos), <strong>abertura</strong> (erosão seguida de dilatação) e <strong>fechamento</strong> (dilatação seguida de erosão) para fazer a correção. Após a aplicação delas, a imagem pode ser filtrada para a correção de ruídos.</p>
+</div>
+<div class="sect2">
+<h3 id="_exercícios_24_2">Exercícios 24.2</h3>
+<div class="paragraph">
+<p>A aplicação das operações de morfologia matemática será em imagens de números de diferentes displays de 7 segmentos. A proposta é convertê-los em uma exibição de número convencional (ou que se aproxime disso). Os números objetos de estudos serão:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::digitos-1.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::digitos-2.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::digitos-3.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::digitos-4.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::digitos-5.png[]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Para o código, foi feito diferentes testes para as imagens com as diferentes operações explicadas anteriormente. Para a exibição dos resultados, contudo, foram priorizados os casos mais eficazes de transformação, conforme mostrados a seguir:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::novos-digitos-1.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::novos-digitos-2.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::novos-digitos-3.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::novos-digitos-4.png[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image::novos-digitos-5.png[]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Para cada dígito testado, os resultados à esquerda se referem à aplicação apenas da operação de erosão morfológica enquanto o da direita é o resultado da abertura. O elemento estruturante utilizado no código foi uma matriz do tipo 3x12, no qual foi utilizado esse valor porque ao deixar no formato 3x3, os números continuavam sendo exibidos de forma separada.</p>
+</div>
+<div class="paragraph">
+<p>Com a matriz 3x12, ao aplicar a erosão, foi notado que os pontos do display se ligaram e com isso sua exibição estava próxima daquilo que vemos como número, juntando assim os trechos separados. No entanto, sua exibição também se nota (possivelmente por influência do elemento estruturante) uma aparência mais "grossa" ou próxima de uma fonte negrito. Ao aplicar uma operação de abertura, essa aparência se tornou mais suavizada, isto se deve porque ele é uma operação de suavização de contornos e de eliminação de saliências finas.</p>
+</div>
+<div class="paragraph">
+<p>O código utilizado para a questão encontra-se adiante:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+int main(int argc, char** argv) {
+    cv::Mat image, erosao, dilatacao, abertura, fechamento, abertfecha;
+    cv::Mat str;
+
+    if (argc != 2) {
+        std::cout &lt;&lt; "morfologia entrada saida\n";
+    }
+
+    image = cv::imread(argv[1], cv::IMREAD_UNCHANGED);
+
+    //  image = cv::imread(argv[1], -1);
+
+    if(image.empty()) {
+        std::cout &lt;&lt; "Erro ao abrir imagem\n" &lt;&lt; argv[1] &lt;&lt; std::endl;
+        return -1;
+    }
+
+    // elemento estruturante
+    // vou criar um elemento estruturante 3x12 c/ todos os valores preenchidos com 1
+    // este 1 indica que ele irá atuar sobre todos os morfologia da vizinhança
+    str = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,12));
+    // erosao
+    cv::erode(image, erosao, str);
+    // dilatacao
+    cv::dilate(image, dilatacao, str);
+    // abertura (erosao seguida de dilatacao)
+    cv::morphologyEx(image, abertura, cv::MORPH_OPEN, str); //morphologyEx permite fazer as operacoes
+    // fechamento (dilatacao seguida de erosao)
+    cv::morphologyEx(image, fechamento, cv::MORPH_CLOSE, str);
+    // abertura -&gt; fechamento
+    cv::morphologyEx(abertura, abertfecha, cv::MORPH_CLOSE, str);
+
+    cv::Mat matArray[] = {erosao, dilatacao, abertura, fechamento, abertfecha};
+    cv::hconcat(matArray, 5, image);
+
+    cv::imshow("morfologia", image);
+
+    cv::waitKey();
+    return 0;
+}</pre>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_primeira_unidade">Primeira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="cap2.html">Cap 2 - Manipulando pixels numa imagem</a></p>
-</li>
-<li>
-<p><a href="cap5.html">Cap 5 - Serialização de dados em ponto flutuante via FileStorage</a></p>
-</li>
-<li>
-<p><a href="cap10.html">Cap 10 - Decomposição de imagens em plano de bits</a></p>
-</li>
-<li>
-<p><a href="cap11.html">Cap 11 - Preenchendo regiões</a></p>
-</li>
-<li>
-<p><a href="cap12.html">Cap 12 - Manipulação de histograma</a></p>
-</li>
-<li>
-<p><a href="cap14.html">Cap 14 - Filtragem no domínio espacial 1 - Convolução</a></p>
-</li>
-<li>
-<p><a href="cap15.html">Cap 15 - Filtragem no domínio espacial 2 - Tiltshift</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_segunda_unidade">Segunda Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade2/cap16.html">Cap 16 - A Transformada Discreta de Fourier</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap17.html">Cap 17 - Filtragem no Domínio da Frequência</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap19.html">Cap 19 - Detecção de Bordas com o Algoritmo de Canny</a></p>
-</li>
-<li>
-<p><a href="unidade2/cap20.html">Cap 20 - Quantização Vetorial com k-means</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_terceira_unidade">Terceira Unidade</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="unidade3/cap21.html">Cap 21 - Extração de Contornos</a></p>
-</li>
-<li>
-<p><a href="unidade3/cap23.html">Cap 23 - Extração de Características - Momentos de Hu para Contornos</a></p>
-</li>
-<li>
-<p><a href="unidade3/cap24.html">Cap 24 - Filtragem de Forma com Morfologia Matemática</a></p>
-</li>
-</ul>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-28 12:08:00 -0300
+Last updated 2025-01-28 12:06:22 -0300
 </div>
 </div>
 </body>
