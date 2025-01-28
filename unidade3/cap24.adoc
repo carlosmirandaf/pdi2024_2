@@ -11,25 +11,29 @@ Os elementos estruturantes usam as operações *erosão* (corrói os contornos),
 
 A aplicação das operações de morfologia matemática será em imagens de números de diferentes displays de 7 segmentos. A proposta é convertê-los em uma exibição de número convencional (ou que se aproxime disso). Os números objetos de estudos serão:
 
-[cols="1,1,1,1,1"]
-|===
-|image::digitos-1.png[]
-|image::digitos-2.png[]
-|image::digitos-3.png[]
-|image::digitos-4.png[]
-|image::digitos-5.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="digitos-1.png" alt="Primeira imagem" style="width: 30%;"/>
+  <img src="digitos-2.png" alt="Segunda imagem" style="width: 30%;"/>
+  <img src="digitos-3.png" alt="Terceira imagem" style="width: 30%;"/>
+  <img src="digitos-4.png" alt="Quarta imagem" style="width: 30%;"/>
+  <img src="digitos-5.png" alt="Quinta imagem" style="width: 30%;"/>
+</div>
+++++
 
 Para o código, foi feito diferentes testes para as imagens com as diferentes operações explicadas anteriormente. Para a exibição dos resultados, contudo, foram priorizados os casos mais eficazes de transformação, conforme mostrados a seguir:
 
-[cols="1,1,1,1,1"]
-|===
-|image::novos-digitos-1.png[]
-|image::novos-digitos-2.png[]
-|image::novos-digitos-3.png[]
-|image::novos-digitos-4.png[]
-|image::novos-digitos-5.png[]
-|===
+[role="image-row"]
+++++
+<div style="display: flex; justify-content: space-between;">
+  <img src="novos-digitos-1.png" alt="Primeira imagem" style="width: 30%;"/>
+  <img src="novos-digitos-2.png" alt="Segunda imagem" style="width: 30%;"/>
+  <img src="novos-digitos-3.png" alt="Terceira imagem" style="width: 30%;"/>
+  <img src="novos-digitos-4.png" alt="Quarta imagem" style="width: 30%;"/>
+  <img src="novos-digitos-5.png" alt="Quinta imagem" style="width: 30%;"/>
+</div>
+++++
 
 Para cada dígito testado, os resultados à esquerda se referem à aplicação apenas da operação de erosão morfológica enquanto o da direita é o resultado da abertura. O elemento estruturante utilizado no código foi uma matriz do tipo 3x12, no qual foi utilizado esse valor porque ao deixar no formato 3x3, os números continuavam sendo exibidos de forma separada.
 
